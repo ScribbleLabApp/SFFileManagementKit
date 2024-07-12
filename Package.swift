@@ -6,28 +6,39 @@ import PackageDescription
 let package = Package(
     name: "SFFileManagementKit",
     products: [
-        // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "SFFileManagementKit",
-            targets: ["SFFileManagementKit"]),
+            targets: ["SFFileManagementKit"]
+        ),
     ],
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "SFFileManagementKit"),
-        .target(name: "SFFileCoreBridge",
+            name: "SFFileManagementKit",
+            dependencies: []
+        ),
+        .target(
+            name: "SFFileCoreBridge",
             dependencies: ["SFFileCxxCore"],
             path: "Sources/SFFileCoreBridge",
-            publicHeadersPath: "Sources/SFFileCoreBridge/include",
+            publicHeadersPath: "include",
             cSettings: [
                 .headerSearchPath("include")
             ]
-               ),
+        ),
         .target(
             name: "SFFileCxxCore",
-            dependencies: ["SFFileManagementKit"],
+            dependencies: ["SFFileManagementKit", "_SFCxxUtils"],
             path: "Sources/SFFileCxxCore",
+            publicHeadersPath: "include",
+            cxxSettings: [
+                .define("CXX_STANDARD", to: "17"),
+                .unsafeFlags(["-std=c++17"], .when(platforms: [.macOS, .iOS]))
+            ]
+        ),
+        .target(
+            name: "_SFCxxUtils",
+            dependencies: [],
+            path: "Sources/_SFCxxUtils",
             publicHeadersPath: "include",
             cxxSettings: [
                 .define("CXX_STANDARD", to: "17"),
