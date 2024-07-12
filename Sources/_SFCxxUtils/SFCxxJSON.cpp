@@ -1,7 +1,6 @@
 //
 //  SFCxxJSON.cpp
 //
-//
 //  Created by Nevio Hirani on 12.07.24.
 //
 
@@ -130,6 +129,64 @@ bool JSON::decodeBool(const std::string& json, size_t& pos) {
 std::nullptr_t JSON::decodeNull(const std::string& json, size_t& pos) {
     pos += 4; // null
     return nullptr;
+}
+
+JSONVariant JSON::decodeObject(const std::string& json, size_t& pos) {
+    ++pos; // skip opening brace
+    JSONVariant result = std::unordered_map<std::string, JSONValuePtr>{};
+    skipWhitespace(json, pos);
+    if (json[pos] == '}') {
+        ++pos; // skip closing brace
+        return result; // empty object
+    }
+
+    while (pos < json.size()) {
+        skipWhitespace(json, pos);
+        std::string key = decodeString(json, pos);
+        skipWhitespace(json, pos);
+        if (json[pos] != ':') {
+            throw std::runtime_error("Expected ':' in object");
+        }
+        ++pos; // skip ':'
+        JSONVariant value = decodeValue(json, pos);
+        std::get<std::unordered_map<std::string, JSONValuePtr>>(result).emplace(std::move(key), std::make_shared<JSONValue>(value));
+        skipWhitespace(json, pos);
+        if (json[pos] == '}') {
+            ++pos; // skip closing brace
+            break;
+        } else if (json[pos] == ',') {
+            ++pos; // skip comma and continue
+        } else {
+            throw std::runtime_error("Expected ',' or '}' in object");
+        }
+    }
+    return result;
+}
+
+JSONVariant JSON::decodeArray(const std::string& json, size_t& pos) {
+    ++pos; // skip opening bracket
+    JSONVariant result = std::vector<JSONValuePtr>{};
+    skipWhitespace(json, pos);
+    if (json[pos] == ']') {
+        ++pos; // skip closing bracket
+        return result; // empty array
+    }
+
+    while (pos < json.size()) {
+        skipWhitespace(json, pos);
+        JSONVariant value = decodeValue(json, pos);
+        std::get<std::vector<JSONValuePtr>>(result).push_back(std::make_shared<JSONValue>(value));
+        skipWhitespace(json, pos);
+        if (json[pos] == ']') {
+            ++pos; // skip closing bracket
+            break;
+        } else if (json[pos] == ',') {
+            ++pos; // skip comma and continue
+        } else {
+            throw std::runtime_error("Expected ',' or ']' in array");
+        }
+    }
+    return result;
 }
 
 } // namespace sfcxx
