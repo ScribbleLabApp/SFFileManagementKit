@@ -1,8 +1,45 @@
-//
-//  SFCxxJSON.cpp
-//
-//  Created by Nevio Hirani on 12.07.24.
-//
+//===-- _SFCxxUtils/SFCxxJSON.cpp - JSON En- and Decoding -------*- C++ -*-===//
+//                                                                            //
+// This source file is part of the Scribble Foundation open source project    //
+//                                                                            //
+// Copyright (c) 2024 ScribbleLabApp. and the ScribbleLab project authors     //
+// Licensed under Apache License v2.0 with Runtime Library Exception          //
+//                                                                            //
+// You may not use this file except in compliance with the License.           //
+// You may obtain a copy of the License at                                    //
+//                                                                            //
+//      http://www.apache.org/licenses/LICENSE-2.0                            //
+//                                                                            //
+// Unless required by applicable law or agreed to in writing, software        //
+// distributed under the License is distributed on an "AS IS" BASIS,          //
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   //
+// See the License for the specific language governing permissions and        //
+// limitations under the License.                                             //
+//                                                                            //
+//===----------------------------------------------------------------------===//
+///
+/// \file
+/// \brief Defines classes and functions for JSON encoding and decoding.
+///
+/// This header file provides facilities for encoding JSON data into a string
+/// format and decoding JSON data from a string format. It defines the `JSON`
+/// class with static methods `encode` and `decode` for performing these operations.
+///
+/// JSON encoding supports various data types including null, boolean, numeric,
+/// string, arrays, and objects. Decoding functions handle JSON objects and arrays
+/// recursively, using variants and shared pointers for flexibility and efficiency.
+///
+/// Example usage:
+/// \code
+///   std::string jsonString = "{\"key\": \"value\"}";
+///   auto jsonVariant = JSON::decode(jsonString);
+///   std::string encodedJson = JSON::encode(jsonVariant);
+/// \endcode
+///
+/// \author ScribbleLabApp
+/// \date July 2024
+///
+//===----------------------------------------------------------------------===//
 
 #include "SFCxxJSON.h"
 #include <sstream>
