@@ -16,10 +16,16 @@
 // See the License for the specific language governing permissions and        //
 // limitations under the License.                                             //
 //                                                                            //
+//     __ _____ _____ _____                                                   //
+//  __|  |   __|     |   | |  SFCxxJSON methods for Scribble Foundation       //
+// |  |  |__   |  |  | | | |  Version 1.0                                     //
+// |_____|_____|_____|_|___|  https://github.com/ScribbleLabApp/              //
+//                                                                            //
 //===----------------------------------------------------------------------===//
 ///
 /// \file
 /// \brief Defines classes and functions for JSON encoding and decoding.
+///
 ///
 /// This header file provides facilities for encoding JSON data into a string
 /// format and decoding JSON data from a string format. It defines the `JSON`

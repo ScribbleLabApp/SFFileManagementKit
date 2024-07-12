@@ -16,6 +16,11 @@
 // See the License for the specific language governing permissions and        //
 // limitations under the License.                                             //
 //                                                                            //
+//     __ _____ _____ _____                                                   //
+//  __|  |   __|     |   | |  SFCxxJSON methods for Scribble Foundation       //
+// |  |  |__   |  |  | | | |  Version 1.0                                     //
+// |_____|_____|_____|_|___|  https://github.com/ScribbleLabApp/              //
+//                                                                            //
 //===----------------------------------------------------------------------===//
 ///
 /// \file
