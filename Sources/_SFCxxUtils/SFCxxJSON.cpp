@@ -76,23 +76,23 @@ void JSON::encodeValue(const JSONVariant& value, std::string& out) {
         out += '"';
         out += std::get<std::string>(value);
         out += '"';
-    } else if (std::holds_alternative<std::vector<JSONValuePtr>>(value)) {
+    } else if (std::holds_alternative<std::vector<std::shared_ptr<JSONValue>>>(value)) {
         out += '[';
-        const auto& vec = std::get<std::vector<JSONValuePtr>>(value);
+        const auto& vec = std::get<std::vector<std::shared_ptr<JSONValue>>>(value);
         for (auto it = vec.begin(); it != vec.end(); ++it) {
             if (it != vec.begin()) out += ',';
-            encodeValue(**it, out); // Dereference the shared_ptr to get JSONValue
+            encodeValue((*it)->value, out); // Use JSONValue's value
         }
         out += ']';
-    } else if (std::holds_alternative<std::unordered_map<std::string, JSONValuePtr>>(value)) {
+    } else if (std::holds_alternative<std::unordered_map<std::string, std::shared_ptr<JSONValue>>>(value)) {
         out += '{';
-        const auto& map = std::get<std::unordered_map<std::string, JSONValuePtr>>(value);
+        const auto& map = std::get<std::unordered_map<std::string, std::shared_ptr<JSONValue>>>(value);
         for (auto it = map.begin(); it != map.end(); ++it) {
             if (it != map.begin()) out += ',';
             out += '"';
             out += it->first;
             out += "\":";
-            encodeValue(*it->second, out); // Dereference the shared_ptr to get JSONValue
+            encodeValue(it->second->value, out); // Use JSONValue's value
         }
         out += '}';
     }
@@ -117,6 +117,49 @@ JSONVariant JSON::decodeValue(const std::string& json, size_t& pos) {
     }
 }
 
+JSONVariant JSON::decodeObject(const std::string& json, size_t& pos) {
+    std::unordered_map<std::string, std::shared_ptr<JSONValue>> result;
+    ++pos; // Skip '{'
+    skipWhitespace(json, pos);
+
+    while (pos < json.size() && json[pos] != '}') {
+        skipWhitespace(json, pos);
+        std::string key = decodeString(json, pos);
+        skipWhitespace(json, pos);
+        ++pos; // Skip ':'
+        skipWhitespace(json, pos);
+        result[key] = std::make_shared<JSONValue>(decodeValue(json, pos));
+        skipWhitespace(json, pos);
+
+        if (json[pos] == ',') {
+            ++pos; // Skip ','
+            skipWhitespace(json, pos);
+        }
+    }
+    ++pos; // Skip '}'
+
+    return result;
+}
+
+JSONVariant JSON::decodeArray(const std::string& json, size_t& pos) {
+    std::vector<std::shared_ptr<JSONValue>> result;
+    ++pos; // Skip '['
+    skipWhitespace(json, pos);
+
+    while (pos < json.size() && json[pos] != ']') {
+        result.push_back(std::make_shared<JSONValue>(decodeValue(json, pos)));
+        skipWhitespace(json, pos);
+
+        if (json[pos] == ',') {
+            ++pos; // Skip ','
+            skipWhitespace(json, pos);
+        }
+    }
+    ++pos; // Skip ']'
+
+    return result;
+}
+
 void JSON::skipWhitespace(const std::string& json, size_t& pos) {
     while (pos < json.size() && std::isspace(json[pos])) {
         ++pos;
@@ -125,7 +168,7 @@ void JSON::skipWhitespace(const std::string& json, size_t& pos) {
 
 std::string JSON::decodeString(const std::string& json, size_t& pos) {
     std::string result;
-    ++pos; // skip opening quote
+    ++pos; // Skip opening quote
     while (pos < json.size()) {
         char current = json[pos++];
         if (current == '"') {
@@ -143,14 +186,8 @@ std::string JSON::decodeString(const std::string& json, size_t& pos) {
 
 double JSON::decodeNumber(const std::string& json, size_t& pos) {
     size_t start = pos;
-    while (pos < json.size() && std::isdigit(json[pos])) {
+    while (pos < json.size() && (std::isdigit(json[pos]) || json[pos] == '.' || json[pos] == '-')) {
         ++pos;
-    }
-    if (pos < json.size() && json[pos] == '.') {
-        ++pos; // skip the dot
-        while (pos < json.size() && std::isdigit(json[pos])) {
-            ++pos;
-        }
     }
     std::istringstream iss(json.substr(start, pos - start));
     double result;
@@ -171,64 +208,6 @@ bool JSON::decodeBool(const std::string& json, size_t& pos) {
 std::nullptr_t JSON::decodeNull(const std::string& json, size_t& pos) {
     pos += 4; // null
     return nullptr;
-}
-
-JSONVariant JSON::decodeObject(const std::string& json, size_t& pos) {
-    ++pos; // skip opening brace
-    JSONVariant result = std::unordered_map<std::string, JSONValuePtr>{};
-    skipWhitespace(json, pos);
-    if (json[pos] == '}') {
-        ++pos; // skip closing brace
-        return result; // empty object
-    }
-
-    while (pos < json.size()) {
-        skipWhitespace(json, pos);
-        std::string key = decodeString(json, pos);
-        skipWhitespace(json, pos);
-        if (json[pos] != ':') {
-            throw std::runtime_error("Expected ':' in object");
-        }
-        ++pos; // skip ':'
-        JSONVariant value = decodeValue(json, pos);
-        std::get<std::unordered_map<std::string, JSONValuePtr>>(result).emplace(std::move(key), std::make_shared<JSONValue>(value));
-        skipWhitespace(json, pos);
-        if (json[pos] == '}') {
-            ++pos; // skip closing brace
-            break;
-        } else if (json[pos] == ',') {
-            ++pos; // skip comma and continue
-        } else {
-            throw std::runtime_error("Expected ',' or '}' in object");
-        }
-    }
-    return result;
-}
-
-JSONVariant JSON::decodeArray(const std::string& json, size_t& pos) {
-    ++pos; // skip opening bracket
-    JSONVariant result = std::vector<JSONValuePtr>{};
-    skipWhitespace(json, pos);
-    if (json[pos] == ']') {
-        ++pos; // skip closing bracket
-        return result; // empty array
-    }
-
-    while (pos < json.size()) {
-        skipWhitespace(json, pos);
-        JSONVariant value = decodeValue(json, pos);
-        std::get<std::vector<JSONValuePtr>>(result).push_back(std::make_shared<JSONValue>(value));
-        skipWhitespace(json, pos);
-        if (json[pos] == ']') {
-            ++pos; // skip closing bracket
-            break;
-        } else if (json[pos] == ',') {
-            ++pos; // skip comma and continue
-        } else {
-            throw std::runtime_error("Expected ',' or ']' in array");
-        }
-    }
-    return result;
 }
 
 } // namespace sfcxx

@@ -26,7 +26,6 @@
 /// \file
 /// \brief Defines classes and functions for JSON encoding and decoding.
 ///
-///
 /// This header file provides facilities for encoding JSON data into a string
 /// format and decoding JSON data from a string format. It defines the `JSON`
 /// class with static methods `encode` and `decode` for performing these operations.
@@ -58,24 +57,22 @@
 
 namespace sfcxx {
 
-/// \brief Represents a JSON value.
-///
-/// This struct serves as the base type for JSON values.
-struct JSONValue {
-    JSONValue() = default;
-    ~JSONValue() = default;
-};
-
-/// \brief Alias for a shared pointer to JSONValue.
-using JSONValuePtr = std::shared_ptr<JSONValue>;
-
 /// \brief Represents a variant of JSON values.
 ///
 /// This variant type can hold null, boolean, numeric, string, arrays of JSON values,
 /// and objects (unordered maps) of JSON values.
 using JSONVariant = std::variant<std::nullptr_t, bool, double, std::string,
-                                 std::vector<JSONValuePtr>,
-                                 std::unordered_map<std::string, JSONValuePtr>>;
+                                 std::vector<std::shared_ptr<struct JSONValue>>,
+                                 std::unordered_map<std::string, std::shared_ptr<struct JSONValue>>>;
+
+/// \brief Represents a JSON value.
+///
+/// This struct serves as the base type for JSON values.
+struct JSONValue {
+    JSONVariant value;
+    JSONValue(JSONVariant val) : value(val) {}
+    ~JSONValue() = default;
+};
 
 /// \brief Provides methods for encoding and decoding JSON data.
 ///
@@ -167,4 +164,3 @@ private:
 }
 
 #endif /* SFCxxJSON_h */
-
