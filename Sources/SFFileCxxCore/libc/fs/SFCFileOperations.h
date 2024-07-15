@@ -37,6 +37,26 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define SFC_SUCCESS 0                       ///< Error code indicating success.
+#define SFC_FAILURE -1                      ///< Error code indicating general failure.
+#define SFC_ERR_MEMORY -2                   ///< Error code indicating insufficient memory.
+#define SFC_ERR_FILE_NOT_FOUND -3           ///< Error code indicating file not found.
+#define SFC_ERR_PERMISSION_DENIED -4        ///< Error code indicating permission denied.
+#define SFC_ERR_FILE_EXSISTS -5             ///< Error code indicating file already exists.
+#define SFC_ERR_INVALID_ARGS -6             ///< Error code indicating invalid arguments.
+#define SFC_ERR_IO -7                       ///< Error code indicating I/O error.
+#define SFC_ERR_READ -8                     ///< Error code indicating failure during read operation.
+#define SFC_ERR_WRITE -9                    ///< Error code indicating failure during write operation.
+#define SFC_ERR_UNKNOWN -10                 ///< Error code indicating unexpected error.
+
+#define SFC_MASK_READ 0x01                  ///< Mask to check read permission.
+#define SFC_MASK_WRITE 0x02                 ///< Mask to check write permission.
+#define SFC_MASK_EXECUTE 0x04               ///< Mask to check execute permission.
+
+#define SFC_FLAG_READ O_RDONLY              ///< Flag to open file for reading.
+#define SFC_FLAG_WRITE O_WRONLY             ///< Flag to open file for writing.
+#define SFC_FLAG_READWRITE O_RDWR           ///< Flag to open file for reading and writing.
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -64,42 +84,102 @@ void* decodeFromJSON(const char* jsonString);
 }
 #endif
 
-/// Writes a JSONVariant to a file.
+/// Creates a new .scribble archive with the necessary directory structure.
 ///
-/// This function writes a JSONVariant to the specified file in JSON format. If the
-/// file does not exist, it will be created. If the file exists, its content will be
-/// truncated before writing.
+/// This function creates a new .scribble archive at the specified path, initializing
+/// the archive with the directories img/vec, txt, and temp, and an empty .scconfig file.
 ///
-/// \param filePath The path of the file to write.
-/// \param jsonVariant A pointer to the JSONVariant object to write.
-/// \return 0 on success, -1 on failure.
-int writeScribbleFile(const char* filePath, void* jsonVariant);
+/// \param archivePath The path where the .scribble archive will be created.
+/// \return 0 on success, SFC_ERR_MEMORY (-2) if memory allocation fails, SFC_ERR_FILE_EXISTS (-5) if the file already exists.
+int createScribbleArchive(const char* archivePath);
 
-/// Reads a JSONVariant from a file.
+/// Deletes the specified .scribble archive.
 ///
-/// This function reads the content of the specified file, which is expected to be
-/// in JSON format, and decodes it into a JSONVariant object.
-///
-/// \param filePath The path of the file to read.
-/// \return A pointer to the decoded JSONVariant object on success, NULL on failure.
-void* readScribbleFile(const char* filePath);
+/// \param archivePath The path to the .scribble archive to delete.
+/// \return 0 on success, SFC_ERR_FILE_NOT_FOUND (-3) if the archive does not exist, SFC_ERR_PERMISSION_DENIED (-4) if permission is denied.
+int deleteScribbleArchive(const char* archivePath);
 
-/// Deletes a file.
+/// Opens the .scribble archive with the specified flags.
 ///
-/// This function deletes the specified file from the file system.
-///
-/// \param filePath The path of the file to delete.
-/// \return 0 on success, -1 on failure.
-int deleteScribbleFile(const char* filePath);
+/// \param archivePath The path to the .scribble archive.
+/// \param flags The flags for opening the archive (e.g., O_RDONLY, O_WRONLY).
+/// \return File descriptor on success, SFC_ERR_FILE_NOT_FOUND (-3) if the archive does not exist, 
+///         SFC_ERR_PERMISSION_DENIED (-4) if permission is denied.
+int openScribbleArchive(const char* archivePath, int flags);
 
-/// Opens a file with specified flags.
+
+/// Writes JSON content to the specified configuration file within the .scribble archive.
 ///
-/// This function opens a file with the given flags and returns the file descriptor.
-/// The flags parameter should be specified using the constants defined in <fcntl.h>.
+/// \param archivePath The path to the .scribble archive.
+/// \param filePath The path to the configuration file within the archive.
+/// \param jsonContent The JSON content to be written to the configuration file.
+/// \return 0 on success, SFC_ERR_FILE_NOT_FOUND (-3) if the archive or file does not exist,
+///         SFC_ERR_PERMISSION_DENIED (-4) if permission is denied, SFC_ERR_WRITE (-9) on write failure
+int writeConfigFile(const char* archivePath, const char* filePath, const char* jsonContent);
+
+/// Reads the JSON content from the specified configuration file within the .scribble archive.
 ///
-/// \param filePath The path of the file to open.
+/// \param archivePath The path to the .scribble archive.
+/// \param filePath The path to the configuration file within the archive.
+/// \return The JSON content as a string, or NULL on failure. The caller is responsible for freeing the returned string.
+///         Returns NULL and sets errno to SFC_ERR_FILE_NOT_FOUND (-3) if the archive or file does not exist, SFC_ERR_READ (-8) on read failure.
+char* readConfigFile(const char* archivePath, const char* filePath);
+
+/// Opens the specified configuration file within the .scribble archive with the given flags.
+///
+/// \param archivePath The path to the .scribble archive.
+/// \param filePath The path to the configuration file within the archive.
 /// \param flags The flags for opening the file (e.g., O_RDONLY, O_WRONLY).
-/// \return The file descriptor on success, -1 on failure.
-int openScribbleFile(const char* filePath, int flags);
+/// \return File descriptor on success, SFC_ERR_FILE_NOT_FOUND (-3) if the archive or file does not exist, SFC_ERR_PERMISSION_DENIED (-4) if permission is denied.
+int openConfigFile(const char* archivePath, const char* filePath, int flags);
+
+
+/// Writes text content to the specified text file within the .scribble archive.
+///
+/// \param archivePath The path to the .scribble archive.
+/// \param filePath The path to the text file within the archive.
+/// \param txtContent The text content to be written to the text file.
+/// \return 0 on success, SFC_ERR_FILE_NOT_FOUND (-3) if the archive or file does not exist, SFC_ERR_PERMISSION_DENIED (-4) if permission is denied, SFC_ERR_WRITE (-9) on write failure.
+int writeTxtFile(const char* archivePath, const char* filePath, const char* txtContent);
+
+/// Reads the text content from the specified text file within the .scribble archive.
+///
+/// \param archivePath The path to the .scribble archive.
+/// \param filePath The path to the text file within the archive.
+/// \return The text content as a string, or NULL on failure. The caller is responsible for freeing the returned string.
+///         Returns NULL and sets errno to SFC_ERR_FILE_NOT_FOUND (-3) if the archive or file does not exist,, SFC_ERR_READ (-8) on read failure.
+char* readTxtFile(const char* archivePath, const char* filePath);
+
+/// Opens the specified text file within the .scribble archive with the given flags.
+///
+/// \param archivePath The path to the .scribble archive.
+/// \param filePath The path to the text file within the archive.
+/// \param flags The flags for opening the file (e.g., O_RDONLY, O_WRONLY).
+/// \return File descriptor on success, SFC_ERR_FILE_NOT_FOUND (-3) if the archive or file does not exist, SFC_ERR_PERMISSION_DENIED  (-4)if permission is denied.
+int openTxtFile(const char* archivePath, const char* filePath, int flags);
+
+
+/// Represents a file with metadata and content.
+///
+/// This struct is used to store information about a file, including whether it is open,
+/// whether it is writable, touched bits, and the file's data. It is used to manage
+/// file operations within the ScribbleLab project.
+///
+/// \param isOpen Indicates if the file is currently open.
+/// \param isWritable Indicates if the file is writable.
+/// \param touchedBits A pointer to a buffer storing touched bits (metadata).
+/// \param touchedSize The size of the touched bits buffer.
+/// \param data A pointer to the file's data.
+/// \param allocSize The allocated size of the data buffer.
+/// \param size The actual size of the data.
+typedef struct file {
+    _Bool isOpen;
+    _Bool isWritable;
+    uint8_t* touchedBits;
+    int touchedSize;
+    char* data;
+    int allocSize;
+    int size;
+} file_t;
 
 #endif /* SFCFileOperations_h */
