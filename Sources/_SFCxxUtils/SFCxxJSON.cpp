@@ -81,7 +81,7 @@ void JSON::encodeValue(const JSONVariant& value, std::string& out) {
         const auto& vec = std::get<std::vector<std::shared_ptr<JSONValue>>>(value);
         for (auto it = vec.begin(); it != vec.end(); ++it) {
             if (it != vec.begin()) out += ',';
-            encodeValue((*it)->value, out); // Use JSONValue's value
+            encodeValue((*it)->value, out);
         }
         out += ']';
     } else if (std::holds_alternative<std::unordered_map<std::string, std::shared_ptr<JSONValue>>>(value)) {
@@ -92,7 +92,7 @@ void JSON::encodeValue(const JSONVariant& value, std::string& out) {
             out += '"';
             out += it->first;
             out += "\":";
-            encodeValue(it->second->value, out); // Use JSONValue's value
+            encodeValue(it->second->value, out);
         }
         out += '}';
     }
@@ -126,24 +126,24 @@ JSONVariant JSON::decodeObject(const std::string& json, size_t& pos) {
         skipWhitespace(json, pos);
         std::string key = decodeString(json, pos);
         skipWhitespace(json, pos);
-        ++pos; // Skip ':'
+        ++pos;                                                              // Skip ':'
         skipWhitespace(json, pos);
         result[key] = std::make_shared<JSONValue>(decodeValue(json, pos));
         skipWhitespace(json, pos);
 
         if (json[pos] == ',') {
-            ++pos; // Skip ','
+            ++pos;                                                          // Skip ','
             skipWhitespace(json, pos);
         }
     }
-    ++pos; // Skip '}'
+    ++pos;                                                                  // Skip '}'
 
     return result;
 }
 
 JSONVariant JSON::decodeArray(const std::string& json, size_t& pos) {
     std::vector<std::shared_ptr<JSONValue>> result;
-    ++pos; // Skip '['
+    ++pos;                                                                  // Skip '['
     skipWhitespace(json, pos);
 
     while (pos < json.size() && json[pos] != ']') {
@@ -151,11 +151,11 @@ JSONVariant JSON::decodeArray(const std::string& json, size_t& pos) {
         skipWhitespace(json, pos);
 
         if (json[pos] == ',') {
-            ++pos; // Skip ','
+            ++pos;                                                          // Skip ','
             skipWhitespace(json, pos);
         }
     }
-    ++pos; // Skip ']'
+    ++pos;                                                                  // Skip ']'
 
     return result;
 }
@@ -168,7 +168,7 @@ void JSON::skipWhitespace(const std::string& json, size_t& pos) {
 
 std::string JSON::decodeString(const std::string& json, size_t& pos) {
     std::string result;
-    ++pos; // Skip opening quote
+    ++pos;                                                                  // Skip opening quote
     while (pos < json.size()) {
         char current = json[pos++];
         if (current == '"') {

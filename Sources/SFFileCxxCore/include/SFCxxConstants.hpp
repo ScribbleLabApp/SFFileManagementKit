@@ -29,4 +29,6 @@
 
 #include <string>
 
+#define SFCxxCORE_VERSION_STRING = "0.1.0"
+
 #endif /* SFCxxConstants_hpp */
