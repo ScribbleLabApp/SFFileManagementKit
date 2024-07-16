@@ -36,6 +36,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
+#include <sys/stat.h>
 
 #define SFC_SUCCESS 0                       ///< Error code indicating success.
 #define SFC_FAILURE -1                      ///< Error code indicating general failure.
@@ -83,6 +85,12 @@ void* decodeFromJSON(const char* jsonString);
 #ifdef __cplusplus
 }
 #endif
+
+#pragma mark - Helper functions start
+
+static int createInitialDirectories(const char* path);
+
+#pragma mark - Helper functions end
 
 /// Creates a new .scribble archive with the necessary directory structure.
 ///

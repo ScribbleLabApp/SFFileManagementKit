@@ -29,6 +29,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "SFCFileOperations.h"
+#include "fssec.h"
+
+#pragma mark - Helper functions start
+
+static int createInitialDirectories(const char* path) {}
+
+#pragma mark - Helper functions end
 
 int createScribbleArchive(const char* archivePath) {}
 
