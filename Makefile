@@ -14,43 +14,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Directories
-OBJDIR := obj
-OBJ_OBJC_DIR := $(OBJDIR)/objc
-OBJ_LIBC_DIR := $(OBJ_OBJC_DIR)/libc
-OBJ_LIBCXX_DIR := $(OBJ_OBJC_DIR)/libcxx/CompressionModule
-
-# Compilation flags
 CC := gcc
 CXX := g++
-CFLAGS := -I/opt/homebrew/opt/openssl@3/include -I./Sources/SFFileCxxCore/include -I./Sources/_SFCxxUtils/include -Wall -Wextra -pedantic
+#CFLAGS := -I/opt/homebrew/Cellar/openssl@3/3.3.1/include -I./Sources/SFFileCxxCore/include -I./Sources/_SFCxxUtils/include -Wall -Wextra -pedantic
+CFLAGS := -l/usr/include/openssl -l./Sources/SFFileCxxCore/include -l.Sources/_SFCxxUtils/include -Wall -Wextra -pedantic
 CXXFLAGS := $(CFLAGS) -std=c++17
 
-# Source file directories
 SRCDIR := Sources
 LIBC_SRC_DIR := $(SRCDIR)/SFFileCxxCore/libc/fs
 LIBCXX_SRC_DIR := $(SRCDIR)/SFFileCxxCore/libcxx/CompressionModule
 
-# Object files
+OBJ_LIBC_DIR := obj/objc/libc
+OBJ_LIBCXX_DIR := obj/objc/libcxx/CompressionModule
+
 LIBC_OBJ := $(OBJ_LIBC_DIR)/SFCFileOperations.o
 LIBCXX_OBJ := $(OBJ_LIBCXX_DIR)/SFCxxCompressionModule.o
 
-# Default target
 all: libc libcxx
 
-# Compile C source files
 libc: $(LIBC_OBJ)
 
 $(OBJ_LIBC_DIR)/%.o: $(LIBC_SRC_DIR)/%.c | $(OBJ_LIBC_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Compile C++ source files
 libcxx: $(LIBCXX_OBJ)
 
 $(OBJ_LIBCXX_DIR)/%.o: $(LIBCXX_SRC_DIR)/%.cpp | $(OBJ_LIBCXX_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# Create directories if they don't exist
 $(OBJ_LIBC_DIR):
 	mkdir -p $@
 
@@ -59,5 +50,4 @@ $(OBJ_LIBCXX_DIR):
 
 .PHONY: clean
 clean:
-	rm -rf $(OBJDIR)
-
+	rm -rf obj
