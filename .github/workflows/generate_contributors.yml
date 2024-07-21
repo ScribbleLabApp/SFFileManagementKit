@@ -1,0 +1,57 @@
+name: Update Contributors List 🚀
+
+on:
+  workflow_dispatch:
+    inputs:
+      trigger:
+        description: 'Manually trigger the workflow'
+        required: true
+        default: 'true'
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/generate_contributors.yml'
+      - 'scripts/generate_contributors_list.sh'
+      - 'CONTRIBUTORS.md'
+
+jobs:
+  update_contributors:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python for GitHub Actions
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.x'
+
+      - name: Run generate_contributors_list.sh
+        run: |
+          chmod +x ./scripts/generate_contributors_list.sh
+          ./scripts/generate_contributors_list.sh
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          git diff --exit-code || echo "Changes detected"
+
+      - name: Commit and create pull request
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add CONTRIBUTORS.md
+          git commit -m "Update CONTRIBUTORS.md"
+          git push origin HEAD:automated-update-contributors
+
+      - name: Create Pull Request
+        uses: devops-infra/action-pull-request@v0.1.1
+        with:
+          title: 'Automated update of CONTRIBUTORS.md'
+          body: 'This pull request updates the CONTRIBUTORS.md file with the latest contributor information.'
+          base: main
+          head: automated-update-contributors
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
