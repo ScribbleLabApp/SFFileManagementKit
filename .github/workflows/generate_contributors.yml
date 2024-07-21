@@ -22,11 +22,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Python for GitHub Actions
-        uses: actions/setup-python@v3
-        with:
-          python-version: '3.x'
-
       - name: Run generate_contributors_list.sh
         run: |
           chmod +x ./scripts/generate_contributors_list.sh
@@ -47,17 +42,18 @@ jobs:
           git push origin HEAD:automated-update-contributors
 
       - name: Install GitHub CLI
-        uses: cli/cli-action@v2
-        with:
-          version: '2.x'
+        run: |
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /usr/share/keyrings/githubcli-archive-keyring.gpg > /dev/null
+          echo "deb [arch=amd64 signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+          sudo apt update
+          sudo apt install gh
 
       - name: Create Pull Request
         if: steps.check_changes.outputs.changed == 'true'
         run: |
+          gh auth login --with-token < ${{ secrets.GITHUB_TOKEN }}
           gh pr create --title "Automated update of CONTRIBUTORS.md" \
                        --body "This pull request updates the CONTRIBUTORS.md file with the latest contributor information." \
                        --base main \
                        --head automated-update-contributors \
                        --repo ${{ github.repository }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
