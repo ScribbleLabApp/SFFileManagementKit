@@ -30,13 +30,23 @@
 #include <stdint.h>
 #include <Kernel/sys/_types/_size_t.h>
 
+/**
+ * @brief Lookup table for CRC32 calculation.
+ *
+ * This static table contains precomputed CRC32 values for each possible byte value
+ * (0-255). It is used to speed up the CRC32 checksum calculation by avoiding
+ * recomputation of CRC values for each byte during the checksum process.
+ * 
+ * The table is initialized by the `crc32_init` function, which computes the CRC
+ * values using the polynomial 0xEDB88320.
+ */
 static uint32_t crc32_table[256];
 
 /**
  * @brief Calculate the CRC32 checksum of a data buffer.
  *
- * This function calculates the CRC32 checksum for a given data buffer
- * using a lookup table. It is implemented in assembly for performance.
+ * This function calculates the CRC32 checksum for a given data buffer using
+ * the `crc32_table` lookup table for efficient computation.
  *
  * @param data Pointer to the data buffer.
  * @param length Length of the data buffer in bytes.
@@ -44,6 +54,14 @@ static uint32_t crc32_table[256];
  */
 extern uint32_t crc32(const uint8_t *data, size_t length);
 
+/**
+ * @brief Initialize the CRC32 lookup table.
+ *
+ * This function initializes the `crc32_table` with precomputed CRC32 values
+ * for each possible byte value (0-255) using the polynomial 0xEDB88320.
+ * It must be called before using the `crc32` function to ensure that
+ * the lookup table contains valid data.
+ */
 void crc32_init(void) {
     uint32_t crc;
     for (uint32_t i = 0; i < 256; i++) {
