@@ -12,4 +12,31 @@
 ##===----------------------------------------------------------------------===##
 
 cmake_minimum_required(VERSION 3.15.1)
-project(SFFileManagementKit)
+project(SFFileManagementKit LANGUAGES C CXX ASM Swift)
+
+# Include CMake modules
+#list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
+
+# Set output directories
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_Swift_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/swift)
+
+# Optionally, set flags for building shared libraries
+option(BUILD_SHARED_LIBS "Build shared libraries by default" YES)
+if(BUILD_SHARED_LIBS)
+  set(CMAKE_POSITION_INDEPENDENT_CODE YES)
+endif()
+
+# Add subdirectories
+add_subdirectory(Sources/SFFileCore)
+add_subdirectory(Sources/SFFileCoreASM)
+add_subdirectory(Sources/SFFileCoreBridge)
+add_subdirectory(Sources/SFFileManagementKit)
+add_subdirectory(_SFUtils)
+
+# Include tests if present
+if(EXISTS "${CMAKE_SOURCE_DIR}/Tests/SFFileManagementKitTests")
+    add_subdirectory(Tests/SFFileManagementKitTests)
+endif()
