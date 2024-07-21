@@ -35,9 +35,9 @@ jobs:
       - name: Check for changes
         id: check_changes
         run: |
-          git diff --exit-code || echo "Changes detected"
+          git diff --exit-code || echo "Changes detected" > changes.txt
 
-      - name: Commit and create pull request
+      - name: Commit and push changes
         if: steps.check_changes.outputs.changed == 'true'
         run: |
           git config user.name "GitHub Actions"
@@ -46,12 +46,18 @@ jobs:
           git commit -m "Update CONTRIBUTORS.md"
           git push origin HEAD:automated-update-contributors
 
-      - name: Create Pull Request
-        uses: devops-infra/action-pull-request@v0.1.1
+      - name: Install GitHub CLI
+        uses: cli/cli-action@v2
         with:
-          title: 'Automated update of CONTRIBUTORS.md'
-          body: 'This pull request updates the CONTRIBUTORS.md file with the latest contributor information.'
-          base: main
-          head: automated-update-contributors
+          version: '2.x'
+
+      - name: Create Pull Request
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          gh pr create --title "Automated update of CONTRIBUTORS.md" \
+                       --body "This pull request updates the CONTRIBUTORS.md file with the latest contributor information." \
+                       --base main \
+                       --head automated-update-contributors \
+                       --repo ${{ github.repository }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
