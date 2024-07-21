@@ -44,6 +44,9 @@ let package = Package(
                 "SFFileCoreBridge",                                 //< ObjC++ bridge
                 "CryptoSwiftWrapper",                               //< SLA depend
                 .product(name: "Crypto", package: "swift-crypto"),  //< APPL depend
+            ],
+            resources: [
+                .copy("PrivacyInfo.xcprivacy"),
             ]
         ),
         
@@ -72,9 +75,13 @@ let package = Package(
                 .product(name: "Crypto", package: "swift-crypto")   //< APPL depend
             ],
             path: "Sources/SFFileCore",
+            resources: [
+                .copy("PrivacyInfo.xcprivacy"),
+            ],
             publicHeadersPath: "include",
             cSettings: [
                 .headerSearchPath("../_SFUtils/include"),
+                .headerSearchPath("../SFFileCoreASM/include")
             ],
             cxxSettings: [
                 .define("CXX_STANDARD", to: "17"),
@@ -92,6 +99,9 @@ let package = Package(
             name: "SFFileCoreASM",
             dependencies: [],
             path: "Sources/SFFileCoreASM",
+            resources: [
+                .copy("PrivacyInfo.xcprivacy"),
+            ],
             publicHeadersPath: "include"
         ),
         
