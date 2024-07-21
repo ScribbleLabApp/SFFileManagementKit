@@ -6,3 +6,9 @@ DerivedData/
 .swiftpm/configuration/registries.json
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
 .netrc
+Sources/_SFUtils/cmake_install.cmake
+Sources/_SFUtils/CMakeCache.txt
+Sources/_SFUtils/CMakeFiles/3.29.3/CMakeCCompiler.cmake
+Sources/_SFUtils/CMakeFiles/3.29.3/CMakeCXXCompiler.cmake
+/Sources/_SFUtils/CMakeFiles
+Sources/_SFUtils/CMakeScripts/ReRunCMake.make
