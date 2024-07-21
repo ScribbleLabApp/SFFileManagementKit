@@ -19,6 +19,8 @@
 //===----------------------------------------------------------------------===//
 ///
 /// \file
+/// This file declares the `crc32` function implemented in assembly. The function
+/// calculates the CRC32 checksum for the given data buffer.
 ///
 //===----------------------------------------------------------------------===//
 
@@ -26,7 +28,35 @@
 #define CRC32_H
 
 #include <stdint.h>
+#include <Kernel/sys/_types/_size_t.h>
 
-uint32_t crc32(const uint8_t *data, size_t length);
+static uint32_t crc32_table[256];
+
+/**
+ * @brief Calculate the CRC32 checksum of a data buffer.
+ *
+ * This function calculates the CRC32 checksum for a given data buffer
+ * using a lookup table. It is implemented in assembly for performance.
+ *
+ * @param data Pointer to the data buffer.
+ * @param length Length of the data buffer in bytes.
+ * @return CRC32 checksum.
+ */
+extern uint32_t crc32(const uint8_t *data, size_t length);
+
+void crc32_init(void) {
+    uint32_t crc;
+    for (uint32_t i = 0; i < 256; i++) {
+        crc = i;
+        for (uint32_t j = 8; j > 0; j--) {
+            if (crc & 1) {
+                crc = (crc >> 1) ^ 0xEDB88320;
+            } else {
+                crc >>= 1;
+            }
+        }
+        crc32_table[i] = crc;
+    }
+}
 
 #endif /* CRC32_H */

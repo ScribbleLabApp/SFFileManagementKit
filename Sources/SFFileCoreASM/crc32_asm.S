@@ -1,5 +1,27 @@
+;===-- SFFileCoreASM/crc32_asm.S - CRC32 AlG --------------------  -*- asm -*-===;
+;                                                                                ;
+; This source file is part of the Scribble Foundation open source project        ;
+;                                                                                ;
+; Copyright (c) 2024 ScribbleLabApp. and the ScribbleLab project authors         ;
+; Licensed under Apache License v2.0 with Runtime Library Exception              ;
+;                                                                                ;
+; You may not use this file except in compliance with the License.               ;
+; You may obtain a copy of the License at                                        ;
+;                                                                                ;
+;      http://www.apache.org/licenses/LICENSE-2.0                                ;
+;                                                                                ;
+; Unless required by applicable law or agreed to in writing, software            ;
+; distributed under the License is distributed on an "AS IS" BASIS,              ;
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.       ;
+; See the License for the specific language governing permissions and            ;
+; limitations under the License.                                                 ;
+;                                                                                ;
+;===--------------------------------------------------------------------------===;
+
+#include "crc32.h"
+
 section .data
-    extern crc32_table     ; Reference to the CRC32 lookup table (declared in another module)
+    extern crc32_table     ; Reference to the CRC32 lookup table (declared in `crc32.h`)
 
 section .text
     global crc32           ; Make the 'crc32' function available globally
