@@ -1,0 +1,46 @@
+name: Build SFFileManagementKit 🚀
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'scripts/build.sh'
+      - 'CMakeLists.txt'
+      - 'Sources/**'
+      - 'include/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install CMake
+        run: |
+          brew install cmake@3.15
+          brew link --force cmake@3.15
+
+      - name: Install Xcode Command Line Tools
+        run: |
+          sudo xcode-select --install
+
+      - name: Verify CMake Version
+        run: cmake --version
+
+      - name: Verify Xcode Command Line Tools
+        run: xcodebuild -version
+
+      - name: Verify Swift Version
+        run: swift --version
+
+      - name: Verify AppleClang Version
+        run: clang --version
+
+      - name: Run build script
+        run: |
+          chmod +x ./scripts/build.sh
+          ./scripts/build.sh
