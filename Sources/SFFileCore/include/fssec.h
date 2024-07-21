@@ -1,4 +1,4 @@
-//===-- include/SFCxxConstants.hpp - Constants ------------------*- Cpp -*-===//
+//===-- SFFileCxxCore/include/fssec.h - File En-/Decryption ----  -*- C -*-===//
 //                                                                            //
 // This source file is part of the Scribble Foundation open source project    //
 //                                                                            //
@@ -19,16 +19,34 @@
 //===----------------------------------------------------------------------===//
 ///
 /// \file
-/// This file provides definitions for constants that are utilized throughout
-/// the SFFileManagementKit  project.
 ///
 //===----------------------------------------------------------------------===//
 
-#ifndef SFCxxConstants_hpp
-#define SFCxxConstants_hpp
+#ifndef fssec_h
+#define fssec_h
 
-#include <string>
+#include <stdint.h>
 
-#define SFCxxCORE_VERSION_STRING = "0.1.0"
+#define AES_KEY_SIZE 256
+#define AES_BLOCK_SIZE 16
 
-#endif /* SFCxxConstants_hpp */
+#define SF_ERR_GENKEY -11           ///< Error code indicating key generation failure.
+#define SF_ERR_ENCR -12             ///< Error code indicating encryption failure.
+#define SF_ERR_DECR -13             ///< Error code indicating decryption failure.
+#define SF_ERR_INIT -14             ///< Error code indicating initialization failure.
+#define SF_ERR_OSSL -15             ///< Error code indicating an OpenSSL error.
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+// Function prototypes
+void* generate_key_iv(unsigned char *key, unsigned char *iv);
+int encrypt_data(const unsigned char *plaintext, int plaintext_len, const unsigned char *key, const unsigned char *iv, unsigned char *ciphertext);
+int decrypt_data(const unsigned char *ciphertext, int ciphertext_len, const unsigned char *key, const unsigned char *iv, unsigned char *plaintext);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* fssec_h */
