@@ -19,10 +19,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Install Homebrew (if not already installed)
+        run: |
+          if ! command -v brew &> /dev/null; then
+            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          fi
+
       - name: Install CMake
         run: |
-          brew install cmake@3.15
-          brew link --force cmake@3.15
+          brew install cmake
 
       - name: Install Xcode Command Line Tools
         run: |
