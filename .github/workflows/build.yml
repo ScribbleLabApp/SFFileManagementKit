@@ -32,11 +32,22 @@ jobs:
           fi
 
       - name: Install CMake
-        run: |
-          brew install cmake
+        run: brew install cmake
 
       - name: Verify CMake Version
         run: cmake --version
+
+      - name: Install ninja
+        run: brew install ninja
+
+      - name: Verify ninja version
+        run: ninja --version
+
+      - name: Install clang-tidy (llvm)
+        run: brew install llvm
+      
+      - name: Set export path for clang-tidy
+        run: echo "export PATH=/opt/homebrew/llvm/bin:$PATH" >> $GITHUB_ENV
 
       - name: Verify Xcode Command Line Tools
         run: xcodebuild -version
