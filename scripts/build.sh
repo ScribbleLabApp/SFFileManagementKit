@@ -57,6 +57,12 @@ if [ -d "$BUILD_DIR" ]; then
     rm -rf "$BUILD_DIR"
 fi
 
+if [ -n "$GITHUB_WORKSPACE" ]; then
+    SOURCE_DIR="$GITHUB_WORKSPACE"
+else
+    SOURCE_DIR=".." # Adjust this if your CMakeLists.txt is not in the parent directory locally
+fi
+
 # Create the build directory
 echo ""
 bold "${ORANGE}==>${RESET} Creating build directory..."
@@ -66,7 +72,7 @@ cd "$BUILD_DIR" || { red "Failed to change directory to $BUILD_DIR"; exit 1; }
 # Configure the project using CMake with Xcode generator
 echo ""
 bold "${ORANGE}==>${RESET} Configuring the project..."
-cmake -G Xcode .. || { red "CMake configuration failed"; exit 1; }
+cmake -G Xcode "$SOURCE_DIR" || { red "CMake configuration failed"; exit 1; } # cmake -G Xcode .. 
 
 # Build the project using Xcode
 echo ""
