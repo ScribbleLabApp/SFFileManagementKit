@@ -14,6 +14,9 @@ on:
       - '.github/workflows/generate_contributors.yml'
       - 'scripts/generate_contributors_list.sh'
       - 'CONTRIBUTORS.md'
+  pull_request:
+    branches:
+      - main
 
 jobs:
   update_contributors:

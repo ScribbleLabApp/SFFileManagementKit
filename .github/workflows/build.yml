@@ -9,6 +9,9 @@ on:
       - 'CMakeLists.txt'
       - 'Sources/**'
       - 'include/**'
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
