@@ -4,6 +4,11 @@
 
 SFFileManagementKit is a comprehensive project for managing file operations and related utilities. It includes several modules written in C, C++, Swift, and assembly language. This project is part of the ScribbleFoundation open-source initiative, aimed at providing robust file management capabilities.
 
+> [!WARNING]
+> Please be aware that this project is still under active development. As such, it may contain bugs, incomplete features, and frequent changes. Use at your own risk and be prepared for potential issues.
+>
+> We appreciate your interest and welcome feedback and contributions. For any questions or issues, please refer to our [Issue Tracker](https://github.com/ScribbleLabApp/SFFileManagementKit/issues) or [Contact Us]().
+
 ## Requirements
 
 Before building the SFFileManagementKit project, ensure you have the following tools and dependencies installed:
@@ -13,6 +18,8 @@ Before building the SFFileManagementKit project, ensure you have the following t
 - **Swift**: Version 6.0 or higher
 - **AppleClang**: Version 16.0 or higher
 - **Command Line Tools**: Xcode 16 Command Line Tools installed
+- **Ninja**: Version 1.12.1 or higher
+- **LLVM (for clang-tidy)**: Homebrew LLVM version 18.1.8 Optimized build.
 
 ### Installation
 
@@ -36,7 +43,7 @@ dependencies: [
 
 ### Build Instructions
 
-To build the project, use the provided `build.sh` script. This script will create a build directory, configure the project with CMake using the Xcode generator, and then build the project using xcodebuild.
+To build the project, use the provided `build.sh` script. This script will create a build directory, configure the project with CMake using the ninja, and then build the project using ninja.
 
 ```sh
 cd scripts
@@ -46,8 +53,9 @@ chmod u+x build.sh
 
 This will:
 - Create a `build` directory in the project root if it does not exist.
-- Configure the project with CMake using the Xcode generator.
-- Build the project using `xcodebuild`.
+- Configure the project with CMake using the ninja.
+- Build the project using `ninja`.
+- Lint the entire project using `clang-tidy`
 
 #### Clean Up
 

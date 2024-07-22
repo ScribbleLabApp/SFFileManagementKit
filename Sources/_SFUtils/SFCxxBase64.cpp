@@ -23,7 +23,7 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#include "SFCxxBase64.h"
+#include "include/SFCxxBase64.h"
 #include <fstream>
 #include <sstream>
 #include <stdexcept>

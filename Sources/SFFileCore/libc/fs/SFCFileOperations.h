@@ -38,7 +38,6 @@
 #include <string.h>
 #include <errno.h>
 #include <sys/stat.h>
-#include <crc32.h>
 
 #define SFC_SUCCESS 0                       ///< Error code indicating success.
 #define SFC_FAILURE -1                      ///< Error code indicating general failure.

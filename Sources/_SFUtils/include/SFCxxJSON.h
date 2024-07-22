@@ -62,7 +62,7 @@ namespace sfcxx {
 /// This variant type can hold null, boolean, numeric, string, arrays of JSON values,
 /// and objects (unordered maps) of JSON values.
 using JSONVariant = std::variant<std::nullptr_t, bool, double, std::string,
-                                 std::vector<std::shared_ptr<struct JSONValue>>,
+                                 std::vector<std::shared_ptr<struct JSONValue> >,
                                  std::unordered_map<std::string, std::shared_ptr<struct JSONValue>>>;
 
 /// \brief Represents a JSON value.

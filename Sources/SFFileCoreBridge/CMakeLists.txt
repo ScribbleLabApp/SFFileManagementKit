@@ -10,6 +10,8 @@
 ##
 ##===----------------------------------------------------------------------===##
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Collect all Swift source files
 file(GLOB_RECURSE BRIDGE_SOURCES "*.swift")
 

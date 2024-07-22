@@ -10,6 +10,8 @@
 ##
 ##===----------------------------------------------------------------------===##
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Add sources for the SFFileManagementKit module
 file(GLOB_RECURSE SOURCES "*.swift")
 

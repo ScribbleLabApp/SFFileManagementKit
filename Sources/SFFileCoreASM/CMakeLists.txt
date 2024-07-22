@@ -1,5 +1,4 @@
 ##===----------------------------------------------------------------------===##
-##
 ## This source file is part of the ScribbleFoundation open source project
 ##
 ## Copyright (c) 2024 ScribbleLabApp. and the Scribble Foundation project authors
@@ -11,26 +10,38 @@
 ##
 ##===----------------------------------------------------------------------===##
 
-# Collect all the assembly and C source files
-file(GLOB_RECURSE ASM_SOURCES
-    "*.S"
+set(CMAKE_C_COMPILER clang)
+set(CMAKE_ASM_COMPILER as)
+
+set(ASM_SOURCES_X86
+    crc32_x86.asm
 )
 
-file(GLOB_RECURSE C_SOURCES
-    "*.c"
+set(ASM_SOURCES_ARM64
+    crc32_arm64.S
 )
 
-file(GLOB_RECURSE C_HEADERS
-    "*.h"
+set(C_SOURCES
+    crc32.c
 )
 
-# Create a static library for the assembly and C code
-add_library(SFFileCoreASM STATIC ${ASM_SOURCES} ${C_SOURCES})
+set(LIBRARY_NAME SFFileCoreASM)
 
-# Specify the include directories for the SFFileCoreASM target
-target_include_directories(SFFileCoreASM PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
+include_directories(${CMAKE_SOURCE_DIR}/include)
 
-# Optionally set properties for the library
-set_target_properties(SFFileCoreASM PROPERTIES VERSION 1.0 SOVERSION 1)
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+    if(APPLE)
+        set(CMAKE_ASM_NASM_OBJECT_FORMAT macho64)
+    else()
+        set(CMAKE_ASM_NASM_OBJECT_FORMAT elf64)
+    endif()
+    add_library(${LIBRARY_NAME} STATIC ${C_SOURCES} ${ASM_SOURCES_X86})
+
+elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
+    add_library(${LIBRARY_NAME} STATIC ${C_SOURCES} ${ASM_SOURCES_ARM64})
+
+else()
+    message(FATAL_ERROR "Unsupported architecture: ${CMAKE_SYSTEM_PROCESSOR}")
+endif()
+
+target_include_directories(${LIBRARY_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include)

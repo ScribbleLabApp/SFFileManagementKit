@@ -11,10 +11,11 @@
 ##===----------------------------------------------------------------------===##
 
 # Define the minimum CMake version and the project
-cmake_minimum_required(VERSION 3.15.1)
+cmake_minimum_required(VERSION 3.30.0) # VERSION 3.30.1
 project(SFFileManagementKit LANGUAGES C CXX ASM Swift)
 
 enable_language(ASM)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Set output directories
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -47,6 +48,13 @@ endif()
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/_SFUtils")
     add_subdirectory(_SFUtils)
+endif()
+
+# Check if clang-tidy is available
+find_program(CLANG_TIDY "clang-tidy")
+if(CLANG_TIDY)
+  message(STATUS "clang-tidy found: ${CLANG_TIDY}")
+  set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY}")
 endif()
 
 # Comment out or remove this line if the tests directory is not yet available
