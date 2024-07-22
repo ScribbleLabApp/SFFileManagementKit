@@ -37,6 +37,9 @@ jobs:
       - name: Verify CMake Version
         run: cmake --version
 
+      - name: Update CMake
+        run: brew upgrade cmake
+
       - name: Install ninja
         run: brew install ninja
 
