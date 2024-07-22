@@ -78,7 +78,7 @@ if ! command -v ninja &> /dev/null; then
         bold "${BLUE}==>${RESET} Ninja found. Proceeding with build"
     fi
 else
-    bold "${GREEN}[SUCCESS]: Ninja found.${RESET}"
+    bold "${BLUE}==>${RESET} Ninja found."
 fi
 
 # Create the build directory
@@ -97,9 +97,8 @@ cmake -G Ninja "$SOURCE_DIR" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON || { red "CMake 
 echo ""
 bold "${ORANGE}==>${RESET} Building the project..."
 #xcodebuild -project SFFileManagementKit.xcodeproj -scheme SFFileManagementKit || { red "Build failed"; exit 1; }
-ninja
+ninja || { red "${BOLD}[ERROR]: Build failed${RESET}"; exit 1; }
 
-echo ""
 bold "${GREEN}[SUCCESS]: Build complete.${RESET}"
 echo ""
 
@@ -149,7 +148,21 @@ fi
 # Run clang-tidy
 echo ""
 bold "${ORANGE}==>${RESET} Running clang-tidy..."
-find "$SOURCE_DIR" -name "*.cpp" -o -name "*.h" | xargs clang-tidy -p "$BUILD_DIR" || { red "clang-tidy analysis failed"; exit 1; }
+find "$SOURCE_DIR" -name "*.cpp" -o -name "*.h" | xargs clang-tidy -p "$BUILD_DIR" 2>&1 || { red "${BOLD}[ERROR]: clang-tidy analysis failed${RESET}"; exit 1; }
+
+if [ $? -ne 0 ]; then
+    bold "${RED}[ERROR]: clang-tidy analysis failed${RESET}"
+    echo "$clang_tidy_output"
+    exit 1
+fi
+
+# Check if clang-tidy produced any warnings or errors
+if [ -n "$clang_tidy_output" ]; then
+    # Output the clang-tidy results
+    echo "$clang_tidy_output"
+    bold "${ORANGE}[WARNING]: clang-tidy found issues${RESET}"
+    exit 1
+fi
 
 echo ""
 bold "${GREEN}[SUCCESS]: Linting successful.${RESET}"
