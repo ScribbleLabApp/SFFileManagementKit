@@ -81,7 +81,9 @@ let package = Package(
             publicHeadersPath: "include",
             cSettings: [
                 .headerSearchPath("../_SFUtils/include"),
-                .headerSearchPath("../SFFileCoreASM/include")
+                .headerSearchPath("../SFFileCoreASM/include"),
+                .headerSearchPath("include/libc"),
+                .headerSearchPath("include/libcxx")
             ],
             cxxSettings: [
                 .define("CXX_STANDARD", to: "17"),
