@@ -46,7 +46,7 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#include "SFCxxJSON.h"
+#include "include/SFCxxJSON.h"
 #include <sstream>
 #include <iomanip>
 
