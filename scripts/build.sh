@@ -63,6 +63,24 @@ else
     SOURCE_DIR=".." # Adjust this if your CMakeLists.txt is not in the parent directory locally
 fi
 
+echo ""
+bold "${ORANGE}==>${RESET} Checking for Ninja..."
+if ! command -v ninja &> /dev/null; then
+    bold "${BLUE}==>${RESET} Ninja not found."
+    bold "${ORANGE}==>${RESET} Installing Ninja..."
+    brew install ninja
+    
+    bold "${ORANGE}==>${RESET} Verify ninja installation..."
+    if ! command -v ninja &> /dev/null; then
+        bold "${RED}[ERROR]: Ninja not found."
+        bold "${RED}         Build script exits with nonzero exit code.${RESET}"
+    else
+        bold "${BLUE}==>${RESET} Ninja found. Proceeding with build"
+    fi
+else
+    bold "${GREEN}[SUCCESS]: Ninja found.${RESET}"
+fi
+
 # Create the build directory
 echo ""
 bold "${ORANGE}==>${RESET} Creating build directory..."
@@ -72,12 +90,73 @@ cd "$BUILD_DIR" || { red "Failed to change directory to $BUILD_DIR"; exit 1; }
 # Configure the project using CMake with Xcode generator
 echo ""
 bold "${ORANGE}==>${RESET} Configuring the project..."
-cmake -G Xcode "$SOURCE_DIR" || { red "CMake configuration failed"; exit 1; } # cmake -G Xcode .. 
+#cmake -G Xcode "$SOURCE_DIR" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON || { red "CMake configuration failed"; exit 1; }
+cmake -G Ninja "$SOURCE_DIR" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON || { red "CMake configuration failed"; exit 1; }
 
 # Build the project using Xcode
 echo ""
 bold "${ORANGE}==>${RESET} Building the project..."
-xcodebuild -project SFFileManagementKit.xcodeproj -scheme SFFileManagementKit || { red "Build failed"; exit 1; }
+#xcodebuild -project SFFileManagementKit.xcodeproj -scheme SFFileManagementKit || { red "Build failed"; exit 1; }
+ninja
 
 echo ""
 bold "${GREEN}[SUCCESS]: Build complete.${RESET}"
+echo ""
+
+##===------------------------------------- Linting -------------------------------------===##
+
+# Ensure clang-tidy is available
+bold "${ORANGE}==>${RESET} Check for clang-tidy..."
+if ! command -v clang-tidy &> /dev/null; then
+    echo ""
+    bold "${BLUE}==>${RESET} clang-tidy not found."
+    bold "${ORANGE}==>${RESET} Installing clang-tidy..."
+    if ! command -v brew &> /dev/null; then
+        echo ""
+        bold "${RED}[ERROR]: Homebrew is not installed. Please install Homebrew first.${RESET}"
+        bold "${RED}         ScribbleLabApp Build Script exits with nonzero exit code.${RESET}"
+        exit 1
+    fi
+    brew install llvm
+    bold "${BLUE}==>${RESET} clang-tidy installed"
+    echo ""
+fi
+
+# Ensure correct PATH for clang-tidy
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    export PATH="/usr/local/opt/llvm/bin:$PATH"        # For Intel Macs
+    if [[ $(uname -m) == "arm64" ]]; then
+        export PATH="/opt/homebrew/opt/llvm/bin:$PATH" # For Apple Silicon Macs
+    fi
+fi
+
+# Verify clang-tidy installation
+if ! command -v clang-tidy &> /dev/null; then
+    red "${BOLD}[ERROR]: clang-tidy not found even after installation.${RESET}"
+    red "${BOLD}         ScribbleLabApp Build Script exits with nonzero exit code.${RESET}"
+    exit 1
+fi
+
+# Check for compile_commands.json
+echo ""
+bold "${ORANGE}==>${RESET} Verify compilation database..."
+if [ ! -f "$BUILD_DIR/compile_commands.json" ]; then
+    red "${BOLD}[ERROR]: Compilation database (compile_commands.json) not found.${RESET}"
+    red "${BOLD}         ScribbleLabApp Build Script exits with nonzero exit code.${RESET}"
+    exit 1
+fi
+
+# Run clang-tidy
+echo ""
+bold "${ORANGE}==>${RESET} Running clang-tidy..."
+find "$SOURCE_DIR" -name "*.cpp" -o -name "*.h" | xargs clang-tidy -p "$BUILD_DIR" || { red "clang-tidy analysis failed"; exit 1; }
+
+echo ""
+bold "${GREEN}[SUCCESS]: Linting successful.${RESET}"
+
+
+echo ""
+bold "${GREEN}[SUCCESS]: Building project completed.${RESET}"
+green "${GREEN}           Exiting build script with exit code 0. SUCESS"
+
+exit 0

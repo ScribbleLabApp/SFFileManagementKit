@@ -11,6 +11,8 @@
 ##
 ##===----------------------------------------------------------------------===##
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Collect all source files for libc
 file(GLOB_RECURSE LIBC_SOURCES
     "libc/**/*.c"

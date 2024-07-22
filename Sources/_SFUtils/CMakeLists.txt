@@ -1,5 +1,7 @@
 # _SFUtils/CMakeLists.txt
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Collect all source files
 file(GLOB_RECURSE UTILS_SOURCES "*.cpp")
 file(GLOB_RECURSE UTILS_HEADERS "*.h")
