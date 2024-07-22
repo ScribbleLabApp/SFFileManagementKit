@@ -14,3 +14,5 @@ Sources/_SFUtils/CMakeFiles/3.29.3/CMakeCXXCompiler.cmake
 Sources/_SFUtils/CMakeScripts/ReRunCMake.make
 
 build/
+/.vscode
+*.o

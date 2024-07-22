@@ -1,4 +1,4 @@
-//===-- SFFileCoreASM/include/crc32.h - CRC32 AlG --------------  -*- C -*-===//
+//===-- SFFileCoreASM/include/crc32.h - CRC32 Algorithm --------  -*- C -*-===//
 //                                                                            //
 // This source file is part of the Scribble Foundation open source project    //
 //                                                                            //
@@ -29,6 +29,10 @@
 
 #include <stdint.h>
 #include <stddef.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief Lookup table for CRC32 calculation.
@@ -63,5 +67,9 @@ uint32_t crc32(const uint8_t *data, size_t length);
  * the lookup table contains valid data.
  */
 void crc32_init(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* CRC32_H */
