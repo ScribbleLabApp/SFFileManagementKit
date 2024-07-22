@@ -11,6 +11,7 @@
 ##
 ##===----------------------------------------------------------------------===##
 
+# Collect all the assembly and C source files
 file(GLOB_RECURSE ASM_SOURCES
     "*.S"
 )
@@ -30,9 +31,6 @@ add_library(SFFileCoreASM STATIC ${ASM_SOURCES} ${C_SOURCES})
 target_include_directories(SFFileCoreASM PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
-
-# Optionally, link against necessary libraries
-# target_link_libraries(SFFileCoreASM PUBLIC SomeLibrary)
 
 # Optionally set properties for the library
 set_target_properties(SFFileCoreASM PROPERTIES VERSION 1.0 SOVERSION 1)
