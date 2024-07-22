@@ -11,7 +11,7 @@
 ##===----------------------------------------------------------------------===##
 
 # Define the minimum CMake version and the project
-cmake_minimum_required(VERSION 3.30.1) # VERSION 3.15.1
+cmake_minimum_required(VERSION 3.30.0) # VERSION 3.30.1
 project(SFFileManagementKit LANGUAGES C CXX ASM Swift)
 
 enable_language(ASM)
