@@ -31,13 +31,101 @@
 #include "SFCFileOperations.h"
 #include "fssec.h"
 
+//     __ _____ _____ _____                                                   //
+//  __|  |   __|     |   | |  SFCxxJSON methods for Scribble Foundation       //
+// |  |  |__   |  |  | | | |  Version 1.0                                     //
+// |_____|_____|_____|_|___|  https://github.com/ScribbleLabApp/              //
+//                                                                            //
+// #include "SFCxxJSON.h"
+
+#include <sys/stat.h>
+#include <errno.h>
+
 #pragma mark - Helper functions start
 
-static int createInitialDirectories(const char* path) {}
+int createDirectory(const char* path) {
+    if (mkdir(path, 0777) != 0) {
+        if (errno != EEXIST) {
+            perror("Directory already exists - SFC_ERR_FILE_EXSISTS");
+            return SFC_ERR_FILE_EXSISTS;
+        }
+
+        perror("An error occurred while creating directory - SFC_ERR_IO");
+        return SFC_ERR_IO;
+    }
+
+    return SFC_SUCCESS;
+}
+
+char* writeJSONBoilerPlate() {
+    // TODO: Implement this function to return JSON content for the config file.
+    // This is a placeholder implementation.
+    return ""; // Return an empty JSON object as a placeholder
+}
+
+int configureConfigFile(const char* archivePath, const char* filePath) {
+    int openResult = openConfigFile(archivePath, filePath, SFC_FLAG_READWRITE);
+    if (openResult != SFC_SUCCESS) {
+        perror("An error occurred while opening config file - SFC_ERR_IO");
+        return openResult;
+    }
+
+    char* jsonContent = writeJSONBoilerPlate();
+    if (jsonContent == NULL) {
+        perror("An error occurred while generating JSON content - SFC_ERR_IO");
+        return SFC_ERR_IO;
+    }
+
+    int writeResult = writeConfigFile(archivePath, filePath, jsonContent);
+    if (writeResult != SFC_SUCCESS) {
+        perror("An error occurred while writing to config file - SFC_ERR_WRITE");
+        return writeResult; // ~> SFC_ERR_WRITE
+    }
+
+    return SFC_SUCCESS;
+}
+
+static int createInitialDirectories(const char* path) { return 0; }
 
 #pragma mark - Helper functions end
 
-int createScribbleArchive(const char* archivePath) {}
+int createScribbleArchive(const char* archivePath) {
+    char imgVecPath[256];
+    char txtPath[256];
+    char tempPath[256];
+    char configFilePath[256];
+
+    snprintf(imgVecPath, sizeof(imgVecPath), "%s/img/vec", archivePath);
+    snprintf(txtPath, sizeof(txtPath), "%s/txt", archivePath);
+    snprintf(tempPath, sizeof(tempPath), "%s/temp", archivePath);
+    snprintf(configFilePath, sizeof(configFilePath), "%s/.scconfig", archivePath);
+
+    if (createDirectory(archivePath) != 0 || 
+        createDirectory(imgVecPath) != 0 || 
+        createDirectory(txtPath) != 0 || 
+        createDirectory(tempPath) != 0) {
+        return SFC_ERR_IO;
+    }
+
+    FILE* configFile = fopen(configFilePath, "w");
+    if (!configFile) {
+        perror("An error occurred while creating the .scconfig file");
+        return SFC_ERR_IO;
+    }
+
+    // TODO: Set up .scconfig file
+
+    configureConfigFile(archivePath, configFilePath);
+
+    if (fclose(configFile) != 0) {
+        perror("An error occurred while closing the .scconfig file");
+        return SFC_ERR_IO;
+    }
+
+    // TODO: Encrypt and secure the archive
+
+    return SFC_SUCCESS;
+}
 
 int deleteScribbleArchive(const char* archivePath) {}
 

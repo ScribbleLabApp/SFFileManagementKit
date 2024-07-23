@@ -59,6 +59,13 @@
 #define SFC_FLAG_WRITE O_WRONLY             ///< Flag to open file for writing.
 #define SFC_FLAG_READWRITE O_RDWR           ///< Flag to open file for reading and writing.
 
+/// \brief Generates JSON .scribble boilerplate.
+///
+/// This function generates JSON content and returns it as a char pointer.
+///
+/// \return A char pointer containing the generated JSON content.
+char* writeJSONBoilerPlate();
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -88,7 +95,32 @@ void* decodeFromJSON(const char* jsonString);
 
 #pragma mark - Helper functions start
 
-static int createInitialDirectories(const char* path);
+
+/// \brief Creates a directory at the specified path.
+/// 
+/// This function creates a directory at the given path.
+/// 
+/// \param path The path where the directory should be created.
+/// \return 0 if the directory is created successfully, -1 otherwise.
+int createDirectory(const char* path);
+
+/// \brief Configures the specified configuration file within the .scribble archive.
+///
+/// This function configures the specified configuration file within the .scribble archive.
+///
+/// \param archivePath The path to the .scribble archive.
+/// \param filePath The path to the configuration file within the archive.
+/// \return 0 on success, SFC_ERR_FILE_NOT_FOUND (-3) if the archive or file does not exist,
+///         SFC_ERR_PERMISSION_DENIED (-4) if permission is denied.
+int configConfigFile(const char* archivePath, const char* filePath);
+
+/// \brief Creates the initial directories for the given path. (DEPRECATED in 0.1.0-beta.1)
+///
+/// This function creates the necessary directories for the given path if they do not already exist.
+///
+/// \param path The path for which to create the initial directories.
+/// \return Returns 0 if the directories are created successfully, or a negative value if an error occurs.
+static int createInitialDirectories(const char* path) __attribute__((deprecated));
 
 #pragma mark - Helper functions end
 
