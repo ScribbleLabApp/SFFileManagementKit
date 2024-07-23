@@ -14,7 +14,7 @@ set(CMAKE_C_COMPILER clang)
 set(CMAKE_ASM_COMPILER as)
 
 set(ASM_SOURCES_X86
-    crc32_x86.asm
+    crc32_x86.S
 )
 
 set(ASM_SOURCES_ARM64
