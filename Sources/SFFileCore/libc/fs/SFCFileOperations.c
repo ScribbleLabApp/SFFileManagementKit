@@ -31,17 +31,68 @@
 #include "SFCFileOperations.h"
 #include "fssec.h"
 
-//     __ _____ _____ _____                                                   //
-//  __|  |   __|     |   | |  SFCxxJSON methods for Scribble Foundation       //
-// |  |  |__   |  |  | | | |  Version 1.0                                     //
-// |_____|_____|_____|_|___|  https://github.com/ScribbleLabApp/              //
-//                                                                            //
-// #include "SFCxxJSON.h"
+#include "SFCJSON.h"
 
 #include <sys/stat.h>
 #include <errno.h>
 
 #pragma mark - Helper functions start
+
+JSONVariant writeJSONBoilerPlate() {
+    JSONVariant project = json_create_object();
+    CHECK_NULL(project);
+    json_set_string(project, "name", "");
+    json_set_string(project, "author", "");
+    json_set_string(project, "created_at", "");
+    json_set_string(project, "last_changed_at", "");
+    json_set_string(project, "editor_version", "");
+
+    JSONVariant document_settings = json_create_object();
+    CHECK_NULL(document_settings);
+    json_set_string(document_settings, "encoding", "");
+    json_set_string(document_settings, "line_endings", "");
+
+    JSONVariant security = json_create_object();
+    CHECK_NULL(security);
+    json_set_boolean(security, "password_protected", 0);
+    json_set_string(security, "encryption_method", "");
+
+    JSONVariant flags = json_create_object();
+    CHECK_NULL(flags);
+    json_set_boolean(flags, "is_Favorite", 0);
+
+    JSONVariant references = json_create_object();
+    CHECK_NULL(references);
+
+    JSONVariant images = json_create_array();
+    CHECK_NULL(images);
+
+    JSONVariant text_files = json_create_array();
+    CHECK_NULL(text_files);
+
+    JSONVariant temporary = json_create_array();
+    CHECK_NULL(temporary);
+
+    JSONVariant root = json_create_object();
+    CHECK_NULL(root);
+    json_set_object(root, "project", project);
+    json_set_object(root, "document_settings", document_settings);
+    json_set_object(root, "security", security);
+    json_set_object(root, "flags", flags);
+    json_set_object(root, "references", references);
+
+    // Free individual JSON variants if necessary
+    // free_json(project);
+    // free_json(document_settings);
+    // free_json(security);
+    // free_json(flags);
+    // free_json(references);
+    // free_json(images);
+    // free_json(text_files);
+    // free_json(temporary);
+
+    return root;
+}
 
 int createDirectory(const char* path) {
     if (mkdir(path, 0777) != 0) {
@@ -55,12 +106,6 @@ int createDirectory(const char* path) {
     }
 
     return SFC_SUCCESS;
-}
-
-char* writeJSONBoilerPlate() {
-    // TODO: Implement this function to return JSON content for the config file.
-    // This is a placeholder implementation.
-    return ""; // Return an empty JSON object as a placeholder
 }
 
 int configureConfigFile(const char* archivePath, const char* filePath) {
@@ -81,6 +126,8 @@ int configureConfigFile(const char* archivePath, const char* filePath) {
         perror("An error occurred while writing to config file - SFC_ERR_WRITE");
         return writeResult; // ~> SFC_ERR_WRITE
     }
+
+    free(jsonContent);
 
     return SFC_SUCCESS;
 }
@@ -113,9 +160,11 @@ int createScribbleArchive(const char* archivePath) {
         return SFC_ERR_IO;
     }
 
-    // TODO: Set up .scconfig file
-
-    configureConfigFile(archivePath, configFilePath);
+    int configResult = configureConfigFile(archivePath, configFilePath);
+    if (configResult != 0) {
+        fclose(configFile);
+        return configResult;
+    }
 
     if (fclose(configFile) != 0) {
         perror("An error occurred while closing the .scconfig file");

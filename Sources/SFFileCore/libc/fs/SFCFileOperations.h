@@ -39,6 +39,8 @@
 #include <errno.h>
 #include <sys/stat.h>
 
+#include "SFCJSON.h"
+
 #define SFC_SUCCESS 0                       ///< Error code indicating success.
 #define SFC_FAILURE -1                      ///< Error code indicating general failure.
 #define SFC_ERR_MEMORY -2                   ///< Error code indicating insufficient memory.
@@ -59,12 +61,20 @@
 #define SFC_FLAG_WRITE O_WRONLY             ///< Flag to open file for writing.
 #define SFC_FLAG_READWRITE O_RDWR           ///< Flag to open file for reading and writing.
 
-/// \brief Generates JSON .scribble boilerplate.
+#define CHECK_NULL(ptr) if ((ptr) == NULL) {       \
+    fprintf(stderr, "Memory allocation failed\n"); \
+    return NULL;                                   \
+}                                                  \
+
+/// \brief Writes a JSON boiler plate to a JSONVariant object.
 ///
-/// This function generates JSON content and returns it as a char pointer.
+/// This function creates a JSONVariant object with a predefined structure,
+/// representing a basic JSON boiler plate. The JSONVariant object can then be
+/// encoded to a JSON string for further processing.
 ///
-/// \return A char pointer containing the generated JSON content.
-char* writeJSONBoilerPlate();
+/// \return A JSONVariant object containing the predefined JSON boiler plate.
+///         The caller is responsible for freeing the JSONVariant object.
+JSONVariant writeJSONBoilerPlate();
 
 #ifdef __cplusplus
 extern "C" {
