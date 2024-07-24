@@ -36,40 +36,44 @@
 #include <sys/stat.h>
 #include <errno.h>
 
+static ConfigArgs g_configArgs;
+
+#pragma mark - Config Arguments functions start
+
+void setConfigData(const ConfigArgs* configArgs) {
+    memcpy(&g_configArgs, configArgs, sizeof(ConfigArgs));
+}
+
+const ConfigArgs* getConfigData(void) {
+    return &g_configArgs;
+}
+
+#pragma mark - Config Arguments functions end
+
 #pragma mark - Helper functions start
 
-JSONVariant writeJSONBoilerPlate(
-                                 const char* name,
-                                 const char* author,
-                                 const char* created_at,
-                                 const char* last_changed_at,
-                                 const char* editor_version,
-                                 const char* encoding,
-                                 const char* line_endings,
-                                 int psw_pr,
-                                 const char* encryption_method,
-                                 int is_Favourite) {
+JSONVariant writeJSONBoilerPlate(void) {
     JSONVariant project = json_create_object();
     CHECK_NULL(project);
-    json_set_string(project, "name", name);
-    json_set_string(project, "author", author);
-    json_set_string(project, "created_at", created_at);
-    json_set_string(project, "last_changed_at", last_changed_at);
-    json_set_string(project, "editor_version", editor_version);
+    json_set_string(project, "name", g_configArgs.name);
+    json_set_string(project, "author", g_configArgs.author);
+    json_set_string(project, "created_at", g_configArgs.created_at);
+    json_set_string(project, "last_changed_at", g_configArgs.last_changed_at);
+    json_set_string(project, "editor_version", g_configArgs.editor_version);
 
     JSONVariant document_settings = json_create_object();
     CHECK_NULL(document_settings);
-    json_set_string(document_settings, "encoding", encoding);
-    json_set_string(document_settings, "line_endings", line_endings);
+    json_set_string(document_settings, "encoding", g_configArgs.encoding);
+    json_set_string(document_settings, "line_endings", g_configArgs.line_endings);
 
     JSONVariant security = json_create_object();
     CHECK_NULL(security);
-    json_set_boolean(security, "password_protected", psw_pr);
-    json_set_string(security, "encryption_method", encryption_method);
+    json_set_boolean(security, "password_protected", g_configArgs.psw_pr);
+    json_set_string(security, "encryption_method", g_configArgs.encryption_method);
 
     JSONVariant flags = json_create_object();
     CHECK_NULL(flags);
-    json_set_boolean(flags, "is_Favorite", is_Favourite);
+    json_set_boolean(flags, "is_Favorite", g_configArgs.is_Favorite);
 
     JSONVariant references = json_create_object();
     CHECK_NULL(references);
@@ -125,17 +129,7 @@ int configureConfigFile(const char* archivePath, const char* filePath) {
         return openResult;
     }
 
-    char* jsonContent = writeJSONBoilerPlate(
-                                                 name,
-                                                 author,
-                                                 created_at,
-                                                 last_changed_at,
-                                                 editor_version,
-                                                 encoding,
-                                                 line_endings,
-                                                 psw_pr,
-                                                 encryption_method,
-                                                 is_Favourite);
+    char* jsonContent = writeJSONBoilerPlate();
     if (jsonContent == NULL) {
         perror("An error occurred while generating JSON content - SFC_ERR_IO");
         return SFC_ERR_IO;

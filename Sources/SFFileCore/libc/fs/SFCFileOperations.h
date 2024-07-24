@@ -66,52 +66,55 @@
     return NULL;                                   \
 }                                                  \
 
+/// \brief Writes a JSON boilerplate for ScribbleLab files.
+///
+/// This function generates a JSON boilerplate with default values for ScribbleLab files.
+/// The boilerplate includes fields such as name, author, created_at, last_changed_at,
+/// editor_version, encoding, line_endings, psw_pr, encryption_method, and is_Favorite.
+///
+/// \return A JSONVariant object representing the JSON boilerplate.
+///         The caller is responsible for managing the memory of the returned JSONVariant.
+JSONVariant writeJSONBoilerPlate(void);
 
-/// \brief Writes a JSON object representing a file's boilerplate metadata.
+/// \brief Represents the configuration arguments for a file.
 ///
-/// This function constructs a JSON object containing the provided metadata for a file.
-/// The JSON object includes fields for the file's name, author, creation and last change timestamps,
-/// editor version, encoding, line endings, password protection level, encryption method,
-/// and whether the file is a favorite.
-///
-/// \param name The name of the file.
-/// \param author The author of the file.
-/// \param created_at The timestamp of when the file was created.
-/// \param last_changed_at The timestamp of when the file was last changed.
-/// \param editor_version The version of the editor used to create or modify the file.
-/// \param encoding The encoding used for the file.
-/// \param line_endings The line endings used in the file.
-/// \param psw_pr The password protection level of the file.
-/// \param encryption_method The encryption method used for the file.
-/// \param is_Favourite Whether the file is marked as a favorite.
-///
-/// \return A JSONVariant object representing the file's boilerplate metadata.
-JSONVariant writeJSONBoilerPlate(
-                                 const char* name,
-                                 const char* author,
-                                 const char* created_at,
-                                 const char* last_changed_at,
-                                 const char* editor_version,
-                                 const char* encoding,
-                                 const char* line_endings,
-                                 int psw_pr,
-                                 const char* encryption_method,
-                                 int is_Favourite);
-
+/// This struct contains various properties related to a file's configuration, such as its name, author, creation date, etc.
+/// It is used to store and retrieve information about a file's configuration.
 typedef struct {
-    char name[256];
-    char author[256];
-    char created_at[256];
-    char last_changed_at[256];
-    char editor_version[256];
-    char encoding[256];
-    char line_endings[256];
-    int psw_pr;
-    char encryption_method[256];
-    int  is_Favorite;
+    char name[256];                 ///< The name of the file.
+    char author[256];               ///< The author of the file.
+    char created_at[256];           ///< The creation date of the file.
+    char last_changed_at[256];      ///< The last change date of the file.
+    char editor_version[256];       ///< The version of the editor used for the file.
+    char encoding[256];             ///< The encoding used for the file.
+    char line_endings[256];         ///< The line endings used in the file.
+    int psw_pr;                     ///< The password protection level of the file.
+    char encryption_method[256];    ///< The encryption method used for the file.
+    int is_Favorite;                ///< Indicates whether the file is marked as a favorite.
 } ConfigArgs;
 
+/// \brief Sets the configuration data for the current file.
+///
+/// This function updates the configuration data for the current file with the provided
+/// ConfigArgs structure. The configuration data includes fields such as name, author,
+/// created_at, last_changed_at, editor_version, encoding, line_endings, psw_pr,
+/// encryption_method, and is_Favorite.
+///
+/// \param configArgs A pointer to a ConfigArgs structure containing the new configuration data.
+///                   The function does not make a copy of the ConfigArgs structure, so the caller
+///                   must ensure that the ConfigArgs structure remains valid for the duration of
+///                   the program.
 void setConfigData(const ConfigArgs* configArgs);
+
+/// \brief Retrieves the configuration data for the current file.
+///
+/// This function retrieves the configuration data for the current file, which includes fields such as name, author,
+/// created_at, last_changed_at, editor_version, encoding, line_endings, psw_pr, encryption_method, and is_Favorite.
+/// The configuration data is stored in a ConfigArgs structure.
+///
+/// \return A pointer to a ConfigArgs structure containing the current file's configuration data.
+///         The caller should not modify the contents of the ConfigArgs structure.
+///         If no configuration data is available, the function returns NULL.
 const ConfigArgs* getConfigData(void);
 
 #ifdef __cplusplus
@@ -142,7 +145,6 @@ void* decodeFromJSON(const char* jsonString);
 #endif
 
 #pragma mark - Helper functions start
-
 
 /// \brief Creates a directory at the specified path.
 /// 
