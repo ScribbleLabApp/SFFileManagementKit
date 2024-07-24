@@ -53,27 +53,29 @@ const ConfigArgs* getConfigData(void) {
 #pragma mark - Helper functions start
 
 JSONVariant writeJSONBoilerPlate(void) {
+    const ConfigArgs* configArgs = getConfigData();
+    
     JSONVariant project = json_create_object();
     CHECK_NULL(project);
-    json_set_string(project, "name", g_configArgs.name);
-    json_set_string(project, "author", g_configArgs.author);
-    json_set_string(project, "created_at", g_configArgs.created_at);
-    json_set_string(project, "last_changed_at", g_configArgs.last_changed_at);
-    json_set_string(project, "editor_version", g_configArgs.editor_version);
+    json_set_string(project, "name", configArgs->name);
+    json_set_string(project, "author", configArgs->author);
+    json_set_string(project, "created_at", configArgs->created_at);
+    json_set_string(project, "last_changed_at", configArgs->last_changed_at);
+    json_set_string(project, "editor_version", configArgs->editor_version);
 
     JSONVariant document_settings = json_create_object();
     CHECK_NULL(document_settings);
-    json_set_string(document_settings, "encoding", g_configArgs.encoding);
-    json_set_string(document_settings, "line_endings", g_configArgs.line_endings);
+    json_set_string(document_settings, "encoding", configArgs->encoding);
+    json_set_string(document_settings, "line_endings", configArgs->line_endings);
 
     JSONVariant security = json_create_object();
     CHECK_NULL(security);
-    json_set_boolean(security, "password_protected", g_configArgs.psw_pr);
-    json_set_string(security, "encryption_method", g_configArgs.encryption_method);
+    json_set_boolean(security, "password_protected", configArgs->psw_pr);
+    json_set_string(security, "encryption_method", configArgs->encryption_method);
 
     JSONVariant flags = json_create_object();
     CHECK_NULL(flags);
-    json_set_boolean(flags, "is_Favorite", g_configArgs.is_Favorite);
+    json_set_boolean(flags, "is_Favorite", configArgs->is_Favorite);
 
     JSONVariant references = json_create_object();
     CHECK_NULL(references);
