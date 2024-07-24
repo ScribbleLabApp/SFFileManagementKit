@@ -33,6 +33,8 @@
 
 #include "SFCJSON.h"
 
+#include <openssl/rand.h>
+
 #include <sys/stat.h>
 #include <errno.h>
 
@@ -148,8 +150,6 @@ int configureConfigFile(const char* archivePath, const char* filePath) {
     return SFC_SUCCESS;
 }
 
-static int createInitialDirectories(const char* path) { return 0; }
-
 #pragma mark - Helper functions end
 
 int createScribbleArchive(const char* archivePath) {
@@ -157,6 +157,8 @@ int createScribbleArchive(const char* archivePath) {
     char txtPath[256];
     char tempPath[256];
     char configFilePath[256];
+
+    char encryptedConfigFilePath[256];
 
     snprintf(imgVecPath, sizeof(imgVecPath), "%s/img/vec", archivePath);
     snprintf(txtPath, sizeof(txtPath), "%s/txt", archivePath);
@@ -187,7 +189,20 @@ int createScribbleArchive(const char* archivePath) {
         return SFC_ERR_IO;
     }
 
-    // TODO: Encrypt and secure the archive
+    unsigned char key[AES_KEY_SIZE / 8];
+    unsigned char iv [AES_BLOCK_SIZE];
+
+    if (!RAND_bytes(key, sizeof(key)) || !RAND_bytes(iv, sizeof(iv))) {
+        perror("An error occurred while generating a key or iv");
+        return SF_ERR_GENKEY;
+    }
+
+    if (encrypt_file(configFilePath, encryptedConfigFilePath, key, iv) != 0) {
+        perror("An error occurred while encrypting the .scconfig file");
+        return SF_ERR_ENCR;
+    }
+
+    // TODO: store the key and IV securely or in a separate secure location
 
     return SFC_SUCCESS;
 }

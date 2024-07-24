@@ -83,7 +83,8 @@ let package = Package(
                 .headerSearchPath("../_SFUtils/include"),
                 .headerSearchPath("../SFFileCoreASM/include"),
                 .headerSearchPath("include/libc"),
-                .headerSearchPath("include/libcxx")
+                .headerSearchPath("include/libcxx"),
+                .headerSearchPath("-L/opt/homebrew/Cellar/openssl@3/3.3.1/include/")
             ],
             cxxSettings: [
                 .define("CXX_STANDARD", to: "17"),

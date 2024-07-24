@@ -17,6 +17,16 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Find OpenSSL package
+find_package(OpenSSL REQUIRED)
+
+if (OpenSSL_FOUND)
+    message(STATUS "Found OpenSSL: ${OPENSSL_VERSION}")
+    include_directories(${OPENSSL_INCLUDE_DIR})
+else()
+    message(FATAL_ERROR "OpenSSL not found")
+endif()
+
 # Collect all source files for libc
 file(GLOB_RECURSE LIBC_SOURCES
     "libc/**/*.c"
@@ -74,6 +84,9 @@ target_include_directories(SFFileCoreLibcxx PUBLIC
 
 # Optionally link libcxx with libc
 target_link_libraries(SFFileCoreLibcxx PRIVATE SFFileCoreLibc)
+
+target_link_libraries(SFFileCoreLibc PRIVATE ${OPENSSL_LIBRARIES})
+target_link_libraries(SFFileCoreLibcxx PRIVATE ${OPENSSL_LIBRARIES})
 
 # Optionally set properties for the libraries
 set_target_properties(SFFileCoreLibc PROPERTIES VERSION 1.0 SOVERSION 1)
