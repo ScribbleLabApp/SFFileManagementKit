@@ -66,15 +66,53 @@
     return NULL;                                   \
 }                                                  \
 
-/// \brief Writes a JSON boiler plate to a JSONVariant object.
+
+/// \brief Writes a JSON object representing a file's boilerplate metadata.
 ///
-/// This function creates a JSONVariant object with a predefined structure,
-/// representing a basic JSON boiler plate. The JSONVariant object can then be
-/// encoded to a JSON string for further processing.
+/// This function constructs a JSON object containing the provided metadata for a file.
+/// The JSON object includes fields for the file's name, author, creation and last change timestamps,
+/// editor version, encoding, line endings, password protection level, encryption method,
+/// and whether the file is a favorite.
 ///
-/// \return A JSONVariant object containing the predefined JSON boiler plate.
-///         The caller is responsible for freeing the JSONVariant object.
-JSONVariant writeJSONBoilerPlate();
+/// \param name The name of the file.
+/// \param author The author of the file.
+/// \param created_at The timestamp of when the file was created.
+/// \param last_changed_at The timestamp of when the file was last changed.
+/// \param editor_version The version of the editor used to create or modify the file.
+/// \param encoding The encoding used for the file.
+/// \param line_endings The line endings used in the file.
+/// \param psw_pr The password protection level of the file.
+/// \param encryption_method The encryption method used for the file.
+/// \param is_Favourite Whether the file is marked as a favorite.
+///
+/// \return A JSONVariant object representing the file's boilerplate metadata.
+JSONVariant writeJSONBoilerPlate(
+                                 const char* name,
+                                 const char* author,
+                                 const char* created_at,
+                                 const char* last_changed_at,
+                                 const char* editor_version,
+                                 const char* encoding,
+                                 const char* line_endings,
+                                 int psw_pr,
+                                 const char* encryption_method,
+                                 int is_Favourite);
+
+typedef struct {
+    char name[256];
+    char author[256];
+    char created_at[256];
+    char last_changed_at[256];
+    char editor_version[256];
+    char encoding[256];
+    char line_endings[256];
+    int psw_pr;
+    char encryption_method[256];
+    int  is_Favorite;
+} ConfigArgs;
+
+void setConfigData(const ConfigArgs* configArgs);
+const ConfigArgs* getConfigData(void);
 
 #ifdef __cplusplus
 extern "C" {
