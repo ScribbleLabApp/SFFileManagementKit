@@ -28,15 +28,15 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#include "SFCFileOperations.h"
 #include "fssec.h"
-
 #include "SFCJSON.h"
+#include "SFCFileOperations.h"
 
-#include <openssl/rand.h>
+#include "keychh.h"
 
-#include <sys/stat.h>
 #include <errno.h>
+#include <sys/stat.h>
+#include <openssl/rand.h>
 
 static ConfigArgs g_configArgs;
 
@@ -202,7 +202,17 @@ int createScribbleArchive(const char* archivePath) {
         return SF_ERR_ENCR;
     }
 
-    // TODO: store the key and IV securely or in a separate secure location
+    int keyResult = storeKeyInKeychain(key, sizeof(key), "key");
+    if (keyResult != 0) {
+        perror("An error occurred while storing the key in the keychain");
+        return keyResult;
+    }
+
+    int ivResult = storeKeyInKeychain(iv, sizeof(iv), "iv");
+    if (keyResult != 0) {
+        perror("An error occurred while storing the IV in the keychain");
+        return ivResult;
+    }
 
     return SFC_SUCCESS;
 }

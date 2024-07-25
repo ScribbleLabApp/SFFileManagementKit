@@ -43,6 +43,7 @@ file(GLOB_RECURSE LIBC_HEADERS
     "include/libcxx/*.hpp"
 
     "../SFFIleCoreASM/include/*.h"
+    "../SFFileCoreBridge/include/*.h"
 )
 
 # Collect all source files for libcxx
@@ -55,6 +56,7 @@ file(GLOB_RECURSE LIBCXX_SOURCES
 
     "../_SFUtils/*.cpp"
     "../_SFUtils/include/SFCJSON.h"
+    "../SFFileCoreBridge/include/*.h"
 )
 
 # Create a static library for libc
@@ -71,6 +73,7 @@ target_include_directories(SFFileCoreLibc PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/libc
     ${CMAKE_SOURCE_DIR}/Sources/SFFileCore/include/libc
     ../_SFUtils/include
+    ../SFFileCoreBridge/include/*.h
 )
 
 target_include_directories(SFFileCoreLibcxx PUBLIC
@@ -80,6 +83,7 @@ target_include_directories(SFFileCoreLibcxx PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/libcxx
     ${CMAKE_SOURCE_DIR}/Sources/SFFileCore/include/libcxx
     ../_SFUtils/include
+    ../SFFileCoreBridge/include/*.h
 )
 
 # Optionally link libcxx with libc

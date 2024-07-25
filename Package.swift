@@ -33,8 +33,8 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-crypto.git", .upToNextMajor(from: "3.5.2")),
-        .package(url: "https://github.com/ScribbleLabApp/CryptoSwiftWrapper.git", .upToNextMajor(from: "0.1.0-beta.2"))
+//        .package(url: "https://github.com/apple/swift-crypto.git", .upToNextMajor(from: "3.5.2")),
+//        .package(url: "https://github.com/ScribbleLabApp/CryptoSwiftWrapper.git", .upToNextMajor(from: "0.1.0-beta.2"))
     ],
     targets: [
         // MARK: - SFFileManagementKit (swift · main)
@@ -42,8 +42,8 @@ let package = Package(
             name: "SFFileManagementKit",
             dependencies: [
                 "SFFileCoreBridge",                                 //< ObjC++ bridge
-                "CryptoSwiftWrapper",                               //< SLA depend
-                .product(name: "Crypto", package: "swift-crypto"),  //< APPL depend
+//                "CryptoSwiftWrapper",                               //< SLA depend
+//                .product(name: "Crypto", package: "swift-crypto"),  //< APPL depend
             ],
             resources: [
                 .copy("PrivacyInfo.xcprivacy"),
@@ -55,8 +55,8 @@ let package = Package(
             name: "SFFileCoreBridge",
             dependencies: [
                 "SFFileCore",                                       //< libc/libcxx
-                "CryptoSwiftWrapper",                               //< SLA depend
-                .product(name: "Crypto", package: "swift-crypto"),  //< APPL depend
+//                "CryptoSwiftWrapper",                               //< SLA depend
+//                .product(name: "Crypto", package: "swift-crypto"),  //< APPL depend
             ],
             path: "Sources/SFFileCoreBridge",
             publicHeadersPath: "include",
@@ -71,8 +71,8 @@ let package = Package(
             dependencies: [
                 "_SFUtils",                                         //< libc/libcxx utils
                 "SFFileCoreASM",                                    //< libasm
-                "CryptoSwiftWrapper",                               //< SLA depend
-                .product(name: "Crypto", package: "swift-crypto")   //< APPL depend
+//                "CryptoSwiftWrapper",                               //< SLA depend
+//                .product(name: "Crypto", package: "swift-crypto")   //< APPL depend
             ],
             path: "Sources/SFFileCore",
             resources: [
