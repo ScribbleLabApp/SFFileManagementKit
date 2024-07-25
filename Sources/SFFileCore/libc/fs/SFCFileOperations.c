@@ -37,6 +37,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <openssl/rand.h>
+#include <CommonCrypto/CommonCrypto.h>
 
 static ConfigArgs g_configArgs;
 
@@ -248,7 +249,87 @@ int deleteScribbleArchive(const char* archivePath) {
     }
 }
 
-int openScribbleArchive(const char* archivePath, int flags) {}
+int openScribbleArchive(const char* archivePath, int flags) {
+    if (archivePath == NULL) {
+        perror("Invalid archive path - SFC_ERR_FILE_NOT_FOUND");
+        return SFC_ERR_FILE_NOT_FOUND;
+    }
+
+    int fd = open(archivePath, flags);
+    if (fd == -1) {
+        perror("An error occurred while opening the file - SFC_ERR_IO");
+        return SFC_ERR_IO;
+    }
+
+    off_t fileSize = lseek(fd, 0, SEEK_END);
+    lseek(fd, 0, SEEK_SET);
+    unsigned char* encryptedData = (unsigned char*)malloc(fileSize);
+    if (read(fd, encryptedData, fileSize) != fileSize) {
+        perror("An error occurred while reading the file - SFC_ERR_READ");
+        close(fd);
+        free(encryptedData);
+        return SFC_ERR_READ;
+    }
+    close(fd);
+
+    CFDataRef keyData = retrieveKeyFromKeychain("key");
+    CFDataRef ivData = retrieveKeyFromKeychain("iv");
+
+    if (keyData == NULL || ivData == NULL) {
+        fprintf(stderr, "An error occurred while retrieving key or iv from keychain - KEYCHH_ERR_KEY_NOT_FOUND\n");
+        if (keyData) CFRelease(keyData);
+        if (ivData) CFRelease(ivData);
+        free(encryptedData);
+        return KEYCHH_ERR_KEY_NOT_FOUND;
+    }
+
+    unsigned char* decryptedData = (unsigned char*)malloc(fileSize);
+    size_t decryptedDataLen = 0;
+    CCCryptorStatus cryptStatus = CCCrypt(
+        kCCDecrypt,
+        kCCAlgorithmAES128,
+        kCCOptionPKCS7Padding,
+        CFDataGetBytePtr(keyData),
+        kCCKeySizeAES128,
+        CFDataGetBytePtr(ivData),
+        encryptedData,
+        fileSize,
+        decryptedData,
+        fileSize,
+        &decryptedDataLen
+    );
+
+    CFRelease(keyData);
+    CFRelease(ivData);
+    free(encryptedData);
+
+    if (cryptStatus != kCCSuccess) {
+        fprintf(stderr, "Decryption of Scribble archive failed - SF_ERR_DECR\n");
+        free(decryptedData);
+        return SF_ERR_DECR;
+    }
+
+    char tempPath[] = "/tmp/scribble_archive_xxxxxx"; // TODO: Change path
+    int tempFd = mkstemp(tempPath);
+    if (tempFd == -1) {
+        perror("Failed to create temporary file - SFC_ERR_IO");
+        free(decryptedData);
+        return SFC_ERR_IO;
+    }
+
+    if (write(tempFd, decryptedData, decryptedDataLen) != decryptedDataLen) {
+        perror("Writing to temporary file failed - SFC_ERR_WRITE");
+        close(tempFd);
+        free(decryptedData);
+        return SFC_ERR_WRITE;
+    }
+
+    free(decryptedData);
+    close(tempFd);
+
+    printf("Decrypted content written to temporary file: %s\n", tempPath);
+    return SFC_SUCCESS;
+}
 
 int writeConfigFile(const char* archivePath, const char* filePath, const char* jsonContent) {}
 
