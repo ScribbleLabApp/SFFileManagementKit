@@ -32,6 +32,7 @@
 #define KEYCHH_ERR_CF_STRING_CREATE             -21
 #define KEYCHH_ERR_KEYCHAIN_ADD_FAILED          -22
 #define KEYCHH_ERR_KEYCHAIN_RETRIEVE_FAILED     -23
+#define KEYCHH_ERR_KEY_NOT_FOUND                -24
 
 /**
  * Sets the bundle identifier for the current application.
@@ -91,5 +92,19 @@ int storeKeyInKeychain(const unsigned char* key, size_t keyLength, const char* k
  * @note This function does not validate the input keySuffix. It is the caller's responsibility to ensure that the provided input is valid.
  */
 CFDataRef retrieveKeyFromKeychain(const char* keySuffix);
+
+/**
+ * Deletes a key from the keychain with a given suffix.
+ *
+ * @param keySuffix A null-terminated C string representing the suffix to be appended to the keychain item's label.
+ *
+ * This function deletes a key from the keychain with a unique label constructed from the bundle identifier and the provided keySuffix.
+ * The key is identified as a generic password item with the kSecAttrAccessible attribute set to kSecAttrAccessibleWhenUnlocked.
+ *
+ * @note This function does not validate the input keySuffix. It is the caller's responsibility to ensure that the provided input is valid.
+ *
+ * @note If the key is not found in the keychain, this function does not return an error.
+ */
+void deleteKeyFromKeychain(const char* keySuffix);
 
 #endif /* keychh_h */

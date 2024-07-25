@@ -92,3 +92,13 @@ CFDataRef retrieveKeyFromKeychain(const char* keySuffix) {
     }
     return NULL;
 }
+
+void deleteKeyFromKeychain(const char* keySuffix) {
+    char identifierString[512];
+    snprintf(identifierString, sizeof(identifierString), "%s.%s", bundleIdentifier, keySuffix);
+
+    CFStringRef key = CFStringCreateWithCString(NULL, identifierString, kCFStringEncodingUTF8);
+    CFPreferencesSetAppValue(key, NULL, kCFPreferencesCurrentApplication);
+    CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication);
+    CFRelease(key);
+}

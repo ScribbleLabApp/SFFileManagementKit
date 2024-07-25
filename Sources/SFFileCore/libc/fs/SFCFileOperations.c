@@ -217,7 +217,36 @@ int createScribbleArchive(const char* archivePath) {
     return SFC_SUCCESS;
 }
 
-int deleteScribbleArchive(const char* archivePath) {}
+int deleteScribbleArchive(const char* archivePath) {
+    if (archivePath == NULL) {
+        perror("Invalid archive path - SFC_ERR_INVALID_ARG");
+        return SFC_ERR_FILE_NOT_FOUND;
+    }
+
+    CFDataRef keyData = retrieveKeyFromKeychain("key");
+    CFDataRef ivData = retrieveKeyFromKeychain("iv");
+
+    if (keyData == NULL || ivData == NULL) {
+        perror("An error occurred while retrieving key or iv from keychain");
+        if (keyData) CFRelease(keyData);
+        if (ivData) CFRelease(ivData);
+        return KEYCHH_ERR_KEY_NOT_FOUND;
+    }
+
+    deleteKeyFromKeychain("key");
+    deleteKeyFromKeychain("iv");
+
+    CFRelease(keyData);
+    CFRelease(ivData);
+
+    if (remove(archivePath) == 0) {
+        printf("The archive was deleted successfully.\n");
+        return SFC_SUCCESS;
+    } else {
+        perror("An error occurred while deleting the file");
+        return SFC_ERR_UNKNOWN;
+    }
+}
 
 int openScribbleArchive(const char* archivePath, int flags) {}
 
