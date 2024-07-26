@@ -97,6 +97,42 @@ int encrypt_file(const char* inputFilePath, const char* outputFilePath, const un
  */
 int decrypt_file(const char* inputFilePath, const char* outputFilePath, const unsigned char* key, const unsigned char* iv);
 
+/**
+ * \brief Decrypts a Scribble archive file.
+ *
+ * This function reads the input Scribble archive file, decrypts its contents using AES-256 in CBC mode,
+ * and writes the decrypted data to a temporary file. The key and IV are assumed to be known and
+ * are not included in this function.
+ *
+ * \param archivePath  A pointer to a null-terminated string representing the path to the input Scribble archive file.
+ *                     The input file must be a valid encrypted file created using the encryptScribbleArchive() function.
+ * \param tempPath     A pointer to a null-terminated string representing the path to the temporary file.
+ *                     The decrypted data will be written to this file.
+ *
+ * \return 0 on success, or a negative error code on failure.
+ *         - SF_ERR_DECR: Decryption failure.
+ *         - SF_ERR_OSSL: An OpenSSL error occurred.
+ */
+int decryptScribbleArchive(const char* archivePath, char* tempPath);
+
+/**
+ * \brief Encrypts a Scribble archive file.
+ *
+ * This function reads the input Scribble archive file, encrypts its contents using AES-256 in CBC mode,
+ * and writes the encrypted data to a temporary file. The key and IV are assumed to be known and
+ * are not included in this function.
+ *
+ * \param archivePath  A pointer to a null-terminated string representing the path to the input Scribble archive file.
+ *                     The input file must be a valid file that can be encrypted.
+ * \param tempPath     A pointer to a null-terminated string representing the path to the temporary file.
+ *                     The encrypted data will be written to this file.
+ *
+ * \return 0 on success, or a negative error code on failure.
+ *         - SF_ERR_ENCR: Encryption failure.
+ *         - SF_ERR_OSSL: An OpenSSL error occurred.
+ */
+int encryptScribbleArchive(const char* archivePath, const char* tempPath);
+
 #ifdef __cplusplus
 }
 #endif

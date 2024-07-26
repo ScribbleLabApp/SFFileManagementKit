@@ -23,8 +23,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "fssec.h"
+#include "keychh.h"
+#include "SFCFileOperations.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <Security/Security.h>
+#include <CommonCrypto/CommonCrypto.h>
 #include <openssl/evp.h>
 #include <openssl/aes.h>
 #include <openssl/rand.h>
@@ -147,4 +151,154 @@ int decrypt_file(const char* inputFilePath, const char* outputFilePath, const un
     fclose(outputFile);
 
     return 0;
+}
+
+int decryptScribbleArchive(const char* archivePath, char* tempPath) {
+    int fd = open(archivePath, O_RDONLY);
+    if (fd == -1) {
+        perror("Failed to open archive - SCF_ERR_IO");
+        return SFC_ERR_IO;
+    }
+
+    off_t fileSize = lseek(fd, 0, SEEK_END);
+    lseek(fd, 0, SEEK_SET);
+    unsigned char* encryptedData = (unsigned char*)malloc(fileSize);
+    if (read(fd, encryptedData, fileSize) != fileSize) {
+        perror("Failed to read the file - SFC_ERR_READ");
+        close(fd);
+        free(encryptedData);
+        return SFC_ERR_READ;
+    }
+    close(fd);
+
+    CFDataRef keyData = retrieveKeyFromKeychain("key");
+    CFDataRef ivData = retrieveKeyFromKeychain("iv");
+
+    if (keyData == NULL || ivData == NULL) {
+        fprint(stderr, "Failed to retrieve key or IV from keychain - KEYCHH_ERR_KEYCHAIN_RETRIEVE_FAILED\n");
+        if (keyData) CFRelease(keyData);
+        if (ivData) CFRelease(ivData);
+        free(encryptedData);
+        return KEYCHH_ERR_KEYCHAIN_RETRIEVE_FAILED;
+    }
+
+    unsigned char* decryptedData = (unsigned char*)malloc(fileSize);
+    size_t decryptedDataLen = 0;
+    CCCryptorStatus cryptStatus = CCCrypt(
+        kCCDecrypt,
+        kCCAlgorithmAES128,
+        kCCOptionPKCS7Padding,
+        CFDataGetBytePtr(keyData),
+        kCCKeySizeAES128,
+        CFDataGetBytePtr(ivData),
+        encryptedData,
+        fileSize,
+        decryptedData,
+        fileSize,
+        &decryptedDataLen
+    );
+
+    CFRelease(keyData);
+    CFRelease(ivData);
+    free(encryptedData);
+
+    if (cryptStatus != kCCSuccess) {
+        fprint(stderr, "Failed to decrypt the archive - SF_ERR_DECR\n");
+        free(decryptedData);
+        return SF_ERR_DECR;;
+    }
+
+    int tempFd = mkstemp(tempPath);
+    if (tempFd == -1) {
+        perror("Failed to create temporary file - SFC_ERR_IO");
+        free(decryptedData);
+        return SFC_ERR_IO;
+    }
+
+    if (write(tempFd, decryptedData, decryptedDataLen) != decryptedDataLen) {
+        perror("Failed to write to temporary file - SFC_ERR_WRITE");
+        close(tempFd);
+        free(decryptedData);
+        return SFC_ERR_WRITE;
+    }
+
+    free(decryptedData);
+    close(tempFd);
+
+    return SFC_SUCCESS;
+}
+
+int encryptScribbleArchive(const char* archivePath, const char* tempPath) {
+    int fd = open(tempPath, O_RDONLY);
+    if (fd == -1) {
+        perror("Failed to open temporary file - SFC_ERR_IO");
+        return SFC_ERR_IO;
+    }
+
+    off_t fileSize = lseek(fd, 0, SEEK_END);
+    lseek(fd, 0, SEEK_SET);
+    unsigned char* decryptedData = (unsigned char*)malloc(fileSize);
+    if (read(fd, decryptedData, fileSize) != fileSize) {
+        perror("Failed to read the temporary file - SFC_ERR_READ");
+        close(fd);
+        free(decryptedData);
+        return SFC_ERR_READ;
+    }
+    close(fd);
+
+    CFDataRef keyData = retrieveKeyFromKeychain("key");
+    CFDataRef ivData = retrieveKeyFromKeychain("iv");
+
+    if (keyData != NULL || ivData == NULL) {
+        fprint(stderr, "Failed to retrieve key or IV from keychain - KEYCHH_ERR_KEYCHAIN_RETRIEVE_FAILED\n");
+        if (keyData) CFRelease(keyData);
+        if (ivData) CFRelease(ivData);
+        free(decryptedData);
+        return KEYCHH_ERR_KEYCHAIN_RETRIEVE_FAILED;
+    }
+
+    unsigned char* encryptedData = (unsigned char*)malloc(fileSize + kCCBlockSizeAES128);
+    size_t encryptedDataLen = 0;
+    CCCryptorStatus cryptStatus = CCCrypt(
+        kCCEncrypt,
+        kCCAlgorithmAES128,
+        kCCOptionPKCS7Padding,
+        CFDataGetBytePtr(keyData),
+        kCCKeySizeAES128,
+        CFDataGetBytePtr(ivData),
+        decryptedData,
+        fileSize,
+        encryptedData,
+        fileSize + kCCBlockSizeAES128,
+        &encryptedDataLen
+    );
+
+    CFRelease(keyData);
+    CFRelease(ivData);
+    free(decryptedData);
+
+    if (cryptStatus != kCCSuccess) {
+        fprint(stderr, "Failed to encrypt the archive - SF_ERR_ENCR\n");
+        free(encryptedData);
+        return SF_ERR_ENCR;
+    }
+
+    int archiveFd = open(archivePath, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (archiveFd == -1) {
+        perror("Failed to open archive file - SFC_ERR_IO");
+        free(encryptedData);
+        return SFC_ERR_IO;
+    }
+
+    if (write(archiveFd, encryptedData, encryptedDataLen) != encryptedDataLen) {
+        perror("Failed to write to archive file - SFC_ERR_WRITE");
+        close(archiveFd);
+        free(encryptedData);
+        return SFC_ERR_WRITE;
+    }
+
+    free(encryptedData);
+    close(archiveFd);
+
+    return SFC_SUCCESS;
 }

@@ -331,7 +331,34 @@ int openScribbleArchive(const char* archivePath, int flags) {
     return SFC_SUCCESS;
 }
 
-int writeConfigFile(const char* archivePath, const char* filePath, const char* jsonContent) {}
+int writeConfigFile(const char* archivePath, const char* filePath, const char* jsonContent) {
+    char tempPath[] = "/tmp/scribble_archive_xxxx";
+
+    if (decryptScribbleArchive(archivePath, tempPath) != 0) {
+        perror("Failed to decrypt archive - SF_ERR_DECR");
+        return SF_ERR_DECR;
+    }
+
+    FILE* configFile = fopen(filePath, "w");
+    if (configFile == NULL) {
+        perror("An error occurred while opening the config file - SFC_ERR_IO");
+        return SFC_ERR_IO;
+    }
+
+    if (fwrite(jsonContent, sizeof(char), strlen(jsonContent), configFile) != strlen(jsonContent)) {
+        perror("An error occurred while writing to the config file - SFC_ERR_WRITE");
+        fclose(configFile);
+        return SFC_ERR_WRITE;
+    }
+
+    fclose(configFile);
+
+    if (encryptScribbleArchive(archivePath, tempPath) != 0) {
+        return SF_ERR_ENCR;
+    }
+
+    return SFC_SUCCESS;
+}
 
 char* readConfigFile(const char* archivePath, const char* filePath) {}
 
