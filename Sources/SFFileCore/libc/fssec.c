@@ -175,7 +175,7 @@ int decryptScribbleArchive(const char* archivePath, char* tempPath) {
     CFDataRef ivData = retrieveKeyFromKeychain("iv");
 
     if (keyData == NULL || ivData == NULL) {
-        fprint(stderr, "Failed to retrieve key or IV from keychain - KEYCHH_ERR_KEYCHAIN_RETRIEVE_FAILED\n");
+        fprintf(stderr, "Failed to retrieve key or IV from keychain - KEYCHH_ERR_KEYCHAIN_RETRIEVE_FAILED\n");
         if (keyData) CFRelease(keyData);
         if (ivData) CFRelease(ivData);
         free(encryptedData);
@@ -203,7 +203,7 @@ int decryptScribbleArchive(const char* archivePath, char* tempPath) {
     free(encryptedData);
 
     if (cryptStatus != kCCSuccess) {
-        fprint(stderr, "Failed to decrypt the archive - SF_ERR_DECR\n");
+        fprintf(stderr, "Failed to decrypt the archive - SF_ERR_DECR\n");
         free(decryptedData);
         return SF_ERR_DECR;;
     }
@@ -250,7 +250,7 @@ int encryptScribbleArchive(const char* archivePath, const char* tempPath) {
     CFDataRef ivData = retrieveKeyFromKeychain("iv");
 
     if (keyData != NULL || ivData == NULL) {
-        fprint(stderr, "Failed to retrieve key or IV from keychain - KEYCHH_ERR_KEYCHAIN_RETRIEVE_FAILED\n");
+        fprintf(stderr, "Failed to retrieve key or IV from keychain - KEYCHH_ERR_KEYCHAIN_RETRIEVE_FAILED\n");
         if (keyData) CFRelease(keyData);
         if (ivData) CFRelease(ivData);
         free(decryptedData);
@@ -278,7 +278,7 @@ int encryptScribbleArchive(const char* archivePath, const char* tempPath) {
     free(decryptedData);
 
     if (cryptStatus != kCCSuccess) {
-        fprint(stderr, "Failed to encrypt the archive - SF_ERR_ENCR\n");
+        fprintf(stderr, "Failed to encrypt the archive - SF_ERR_ENCR\n");
         free(encryptedData);
         return SF_ERR_ENCR;
     }
