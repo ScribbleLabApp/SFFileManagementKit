@@ -332,7 +332,7 @@ int openScribbleArchive(const char* archivePath, int flags) {
 }
 
 int writeConfigFile(const char* archivePath, const char* filePath, const char* jsonContent) {
-    char tempPath[] = "/tmp/scribble_archive_xxxx";
+    char tempPath[] = "/tmp/scribble_archive_xxxx"; // TODO: Change path
 
     if (decryptScribbleArchive(archivePath, tempPath) != 0) {
         perror("Failed to decrypt archive - SF_ERR_DECR");
@@ -360,7 +360,14 @@ int writeConfigFile(const char* archivePath, const char* filePath, const char* j
     return SFC_SUCCESS;
 }
 
-char* readConfigFile(const char* archivePath, const char* filePath) {}
+char* readConfigFile(const char* archivePath, const char* filePath) {
+    if (archivePath == NULL) {
+        perror("Config File not found - SFC_ERR_FILE_NOT_FOUND");
+        return NULL;
+    }
+
+
+}
 
 int openConfigFile(const char* archivePath, const char* filePath, int flags) {}
 
