@@ -95,6 +95,14 @@
 #define __kpi_unavailable __unavailable
 #define __kpi_deprecated_arm64_macos_unavailable __unavailable
 
+#if __has_attribute(__availability__)
+    #define __OSX_AVAILABLE_STARTING(_mac, _iphone) __attribute__((__availability__(macOS, introduced=_mac, ios, introduced=_iphone)))
+    #define __API_AVAILABLE(_mac, _ios, _tvos, _watchos) __attribute__((__availability__(macOS, introduced=_mac), __availability__(ios, introduced=_ios), __availability__(tvos, introduced=_tvos), __availability__(watchOS, introduced=_watchos)))
+#else
+    #define __OSX_AVAILABLE_STARTING(_mac, _iphone)
+    #define __API_AVAILABLE(_mac, _ios, _tvos, _watchos)
+#endif
+
 /* Swift-related attributes */
 #if __has_feature(attribute_availability_swift)
     #define __swift_unavailable(_msg) __attribute__((__availability__(swift, unavailable, message=_msg)))
@@ -110,6 +118,14 @@
     #define __swift_unavailable_from_async(_msg)
     #define __swift_nonisolated
     #define __swift_nonisolated_unsafe
+#endif
+
+#if defined(__cplusplus)
+    #define __BEGIN_DECLS extern "C" {
+    #define __END_DECLS }
+#else
+    #define __BEGIN_DECLS
+    #define __END_DECLS
 #endif
 
 /* Compile-time Assertions and Utility Macros */
