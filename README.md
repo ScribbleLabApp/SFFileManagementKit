@@ -11,6 +11,12 @@ SFFileManagementKit is a comprehensive project for managing file operations and 
 >
 > We appreciate your interest and welcome feedback and contributions. For any questions or issues, please refer to our [Issue Tracker](https://github.com/ScribbleLabApp/SFFileManagementKit/issues) or [Contact Us]().
 
+### Version Support
+
+| Package version                 |   Swift version   |  Xcode release |
+| :-----------------------------: | :---------------: | :------------: |
+| SFFileManagementKit 0.0.1-alpha |    >= 6.0         |  >= Xcode 16.0 |
+
 ## Requirements
 
 Before building the SFFileManagementKit project, ensure you have the following tools and dependencies installed:
