@@ -29,14 +29,18 @@
 //===----------------------------------------------------------------------===//
 
 #include "fssec.h"
+#include "keychh.h"
 #include "SFCJSON.h"
 #include "SFCFileOperations.h"
-
-#include "keychh.h"
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
 #include <errno.h>
 #include <sys/stat.h>
 #include <openssl/rand.h>
+#include <Security/Security.h>
 #include <CommonCrypto/CommonCrypto.h>
 
 static ConfigArgs g_configArgs;
@@ -361,12 +365,16 @@ int writeConfigFile(const char* archivePath, const char* filePath, const char* j
 }
 
 char* readConfigFile(const char* archivePath, const char* filePath) {
+    char tempPath[] = "/tmp/scribble_archive_XXXXXX";
+
     if (archivePath == NULL) {
-        perror("Config File not found - SFC_ERR_FILE_NOT_FOUND");
+        perror("Invalid archive path - SFC_ERR_FILE_NOT_FOUND");
         return NULL;
     }
 
-
+    if (decryptScribbleArchive(archivePath, tempPath) != 0) {
+        return NULL;
+    }
 }
 
 int openConfigFile(const char* archivePath, const char* filePath, int flags) {}

@@ -1,3 +1,5 @@
+<img src="Sources/SFFileManagementKit/Documentation.docc/Resources/SFFileManagementKit@1x.png" width="150" align="right">
+
 # SFFileManagementKit
 
 ## Overview
