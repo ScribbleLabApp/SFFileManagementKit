@@ -166,16 +166,16 @@ int createScribbleArchive(const char* archivePath) {
     char encryptedConfigFilePath[256];
 
     if (snprintf(imgVecPath, sizeof(imgVecPath), "%s/img/vec", archivePath) < 0) {
-        perror("An error occurred while formatting imgVecPath");
+        fprintf(stderr, "An error occurred while formatting 'imgVecPath'\n");
         return SFC_ERR_IO;
     }
     if (snprintf(txtPath, sizeof(txtPath), "%s/txt", archivePath) < 0) {
-        perror("An error occurred while formatting txtPath");
+        fprintf(stderr, "An error occurred while formatting 'txtPath'\n");
         return SFC_ERR_IO;
     }
 
     if(snprintf(tempPath, sizeof(tempPath), "%s/temp", archivePath) < 0) {
-        perror("An error occurred while formatting tempPath");
+        fprintf(stderr, "An error occurred while formatting 'tempPath'\n");
         return SFC_ERR_IO;
     }
     snprintf(configFilePath, sizeof(configFilePath), "%s/.scconfig", archivePath);
