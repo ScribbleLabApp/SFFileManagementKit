@@ -28,4 +28,4 @@
 
 #include "SFCException.hpp"
 
-SFCException::WarningHandler SFCException::sWarningHandler = NULL;
+SFCException::WarningHandler SFCException::sWarningHandler = nullptr;

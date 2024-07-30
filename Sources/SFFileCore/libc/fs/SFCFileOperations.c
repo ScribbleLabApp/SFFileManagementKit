@@ -119,13 +119,13 @@ JSONVariant writeJSONBoilerPlate(void) {
 
 int createDirectory(const char* path) {
     if (mkdir(path, 0777) != 0) {
-        if (errno != EEXIST) {
+        if (errno == EEXIST) {
             perror("Directory already exists - SFC_ERR_FILE_EXSISTS");
             return SFC_ERR_FILE_EXSISTS;
+        } else {
+            perror("An error occurred while creating directory - SFC_ERR_IO");
+            return SFC_ERR_IO;
         }
-
-        perror("An error occurred while creating directory - SFC_ERR_IO");
-        return SFC_ERR_IO;
     }
 
     return SFC_SUCCESS;
@@ -165,9 +165,19 @@ int createScribbleArchive(const char* archivePath) {
 
     char encryptedConfigFilePath[256];
 
-    snprintf(imgVecPath, sizeof(imgVecPath), "%s/img/vec", archivePath);
-    snprintf(txtPath, sizeof(txtPath), "%s/txt", archivePath);
-    snprintf(tempPath, sizeof(tempPath), "%s/temp", archivePath);
+    if (snprintf(imgVecPath, sizeof(imgVecPath), "%s/img/vec", archivePath) < 0) {
+        perror("An error occurred while formatting imgVecPath");
+        return SFC_ERR_IO;
+    }
+    if (snprintf(txtPath, sizeof(txtPath), "%s/txt", archivePath) < 0) {
+        perror("An error occurred while formatting txtPath");
+        return SFC_ERR_IO;
+    }
+
+    if(snprintf(tempPath, sizeof(tempPath), "%s/temp", archivePath) < 0) {
+        perror("An error occurred while formatting tempPath");
+        return SFC_ERR_IO;
+    }
     snprintf(configFilePath, sizeof(configFilePath), "%s/.scconfig", archivePath);
 
     if (createDirectory(archivePath) != 0 || 

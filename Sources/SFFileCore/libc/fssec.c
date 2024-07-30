@@ -205,7 +205,7 @@ int decryptScribbleArchive(const char* archivePath, char* tempPath) {
     if (cryptStatus != kCCSuccess) {
         fprintf(stderr, "Failed to decrypt the archive - SF_ERR_DECR\n");
         free(decryptedData);
-        return SF_ERR_DECR;;
+        return SF_ERR_DECR;
     }
 
     int tempFd = mkstemp(tempPath);
@@ -249,7 +249,7 @@ int encryptScribbleArchive(const char* archivePath, const char* tempPath) {
     CFDataRef keyData = retrieveKeyFromKeychain("key");
     CFDataRef ivData = retrieveKeyFromKeychain("iv");
 
-    if (keyData != NULL || ivData == NULL) {
+    if (keyData == NULL || ivData == NULL) {
         fprintf(stderr, "Failed to retrieve key or IV from keychain - KEYCHH_ERR_KEYCHAIN_RETRIEVE_FAILED\n");
         if (keyData) CFRelease(keyData);
         if (ivData) CFRelease(ivData);

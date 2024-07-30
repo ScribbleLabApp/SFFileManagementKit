@@ -216,9 +216,9 @@ std::nullptr_t JSON::decodeNull(const std::string& json, size_t& pos) {
 
 extern "C" {
 const char* json_encode(JSONVariant value) {
-    static std::string encoded;
+    thread_local std::string encoded;
     encoded = sfcxx::JSON::encode(*reinterpret_cast<const sfcxx::JSONVariant*>(&value));
-
+    
     return encoded.c_str();
 }
 
