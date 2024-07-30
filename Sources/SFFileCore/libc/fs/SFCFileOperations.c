@@ -373,11 +373,55 @@ char* readConfigFile(const char* archivePath, const char* filePath) {
     }
 
     if (decryptScribbleArchive(archivePath, tempPath) != 0) {
+        perror("Failed to decrypt archive - SF_ERR_DECR");
         return NULL;
     }
+
+    FILE* configFile = fopen(archivePath, "r");
+    if (configFile == NULL) {
+        perror("Failed to open config file - SF_ERR_IO");
+        return NULL;
+    }
+
+    fseek(configFile, 0, SEEK_END);
+    long fileSize = ftell(configFile);
+    fseek(configFile, 0, SEEK_SET);
+
+    char* content = (char*)malloc(fileSize + 1);
+    if (content == NULL) {
+        perror("Failed to allocate memory for config file content - SF_ERR_MEM");
+        fclose(configFile);
+        return NULL;
+    }
+
+    if (fread(content, sizeof(char), fileSize, configFile) != fileSize) {
+        perror("Failed to read config file content - SF_ERR_READ");
+        free(content);
+        fclose(configFile);
+        return NULL;
+    }
+
+    content[fileSize] = '\0';
+    fclose(configFile);
+
+    return content;
 }
 
-int openConfigFile(const char* archivePath, const char* filePath, int flags) {}
+int openConfigFile(const char* archivePath, const char* filePath, int flags) {
+    char tempPath[] = "/tmp/scribble_archive_XXXXXX";
+
+    if (decryptScribbleArchive(archivePath, tempPath) != 0) {
+        return -1;
+    }
+
+    int fd = open(filePath, flags);
+    if (fd == -1) {
+        perror("An error occurred while opening the file - SFC_ERR_IO");
+        return SFC_ERR_IO;
+    }
+
+    return fd;
+}
 
 int writeTxtFile(const char* archivePath, const char* filePath, const char* txtContent) {}
 
