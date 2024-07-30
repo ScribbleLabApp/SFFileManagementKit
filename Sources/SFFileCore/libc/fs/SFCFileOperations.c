@@ -120,10 +120,10 @@ JSONVariant writeJSONBoilerPlate(void) {
 int createDirectory(const char* path) {
     if (mkdir(path, 0777) != 0) {
         if (errno == EEXIST) {
-            perror("Directory already exists - SFC_ERR_FILE_EXSISTS");
+            fprintf(stderr, "Directory '%s' already exists - SFC_ERR_FILE_EXSISTS\n", path);
             return SFC_ERR_FILE_EXSISTS;
         } else {
-            perror("An error occurred while creating directory - SFC_ERR_IO");
+            fprintf(stderr, "An error occurred while creating directory '%s' - SFC_ERR_IO\n", path);
             return SFC_ERR_IO;
         }
     }
