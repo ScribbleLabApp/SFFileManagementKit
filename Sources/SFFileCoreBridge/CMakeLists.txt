@@ -17,7 +17,10 @@ file(GLOB_RECURSE BRIDGE_SOURCES "*.swift")
 
 # Collect all Objective-C++ source and header files
 file(GLOB_RECURSE OBJCxx_SOURCES "*.mm")
-file(GLOB_RECURSE OBJCxx_HEADERS "*.h")
+file(GLOB_RECURSE OBJCxx_HEADERS
+    "*.h"
+    "include/*.h"
+)
 
 # Add the library target
 add_library(SFFileCoreBridge ${BRIDGE_SOURCES} ${OBJCxx_SOURCES} ${OBJCxx_HEADERS})

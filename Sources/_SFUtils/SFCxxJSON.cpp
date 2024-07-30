@@ -47,6 +47,8 @@
 //===----------------------------------------------------------------------===//
 
 #include "include/SFCxxJSON.h"
+#include "include/SFCJSON.h"
+
 #include <sstream>
 #include <iomanip>
 
@@ -211,3 +213,22 @@ std::nullptr_t JSON::decodeNull(const std::string& json, size_t& pos) {
 }
 
 } // namespace sfcxx
+
+extern "C" {
+const char* json_encode(JSONVariant value) {
+    static std::string encoded;
+    encoded = sfcxx::JSON::encode(*reinterpret_cast<const sfcxx::JSONVariant*>(&value));
+
+    return encoded.c_str();
+}
+
+JSONVariant json_decode(const char* json) {
+    auto variant = sfcxx::JSON::decode(json);
+
+    return new sfcxx::JSONValue(variant);
+}
+
+void free_json(JSONVariant value) {
+    delete static_cast<sfcxx::JSONValue*>(value);
+}
+}

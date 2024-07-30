@@ -1,3 +1,5 @@
+<img src="Sources/SFFileManagementKit/Documentation.docc/Resources/SFFileManagementKit@1x.png" width="150" align="right">
+
 # SFFileManagementKit
 
 ## Overview
@@ -19,7 +21,8 @@ Before building the SFFileManagementKit project, ensure you have the following t
 - **AppleClang**: Version 16.0 or higher
 - **Command Line Tools**: Xcode 16 Command Line Tools installed
 - **Ninja**: Version 1.12.1 or higher
-- **LLVM (for clang-tidy)**: Homebrew LLVM version 18.1.8 Optimized build.
+- **LLVM (for clang-tidy)**: Homebrew LLVM version 18.1.8 Optimized build
+- **OpenSSL**: Version 3.3.1 stable (bottled)
 
 ### Installation
 

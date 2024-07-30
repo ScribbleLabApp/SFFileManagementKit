@@ -17,6 +17,16 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Find OpenSSL package
+find_package(OpenSSL REQUIRED)
+
+if (OpenSSL_FOUND)
+    message(STATUS "Found OpenSSL: ${OPENSSL_VERSION}")
+    include_directories(${OPENSSL_INCLUDE_DIR})
+else()
+    message(FATAL_ERROR "OpenSSL not found")
+endif()
+
 # Collect all source files for libc
 file(GLOB_RECURSE LIBC_SOURCES
     "libc/**/*.c"
@@ -33,6 +43,7 @@ file(GLOB_RECURSE LIBC_HEADERS
     "include/libcxx/*.hpp"
 
     "../SFFIleCoreASM/include/*.h"
+    "../SFFileCoreBridge/include/*.h"
 )
 
 # Collect all source files for libcxx
@@ -44,7 +55,8 @@ file(GLOB_RECURSE LIBCXX_SOURCES
     "include/libcxx/*.hpp"
 
     "../_SFUtils/*.cpp"
-    "../_SFUtils/include/*.h"
+    "../_SFUtils/include/SFCJSON.h"
+    "../SFFileCoreBridge/include/*.h"
 )
 
 # Create a static library for libc
@@ -60,6 +72,8 @@ target_include_directories(SFFileCoreLibc PUBLIC
 
     ${CMAKE_CURRENT_SOURCE_DIR}/include/libc
     ${CMAKE_SOURCE_DIR}/Sources/SFFileCore/include/libc
+    ../_SFUtils/include
+    ../SFFileCoreBridge/include/*.h
 )
 
 target_include_directories(SFFileCoreLibcxx PUBLIC
@@ -68,10 +82,15 @@ target_include_directories(SFFileCoreLibcxx PUBLIC
     
     ${CMAKE_CURRENT_SOURCE_DIR}/include/libcxx
     ${CMAKE_SOURCE_DIR}/Sources/SFFileCore/include/libcxx
+    ../_SFUtils/include
+    ../SFFileCoreBridge/include/*.h
 )
 
 # Optionally link libcxx with libc
 target_link_libraries(SFFileCoreLibcxx PRIVATE SFFileCoreLibc)
+
+target_link_libraries(SFFileCoreLibc PRIVATE ${OPENSSL_LIBRARIES})
+target_link_libraries(SFFileCoreLibcxx PRIVATE ${OPENSSL_LIBRARIES})
 
 # Optionally set properties for the libraries
 set_target_properties(SFFileCoreLibc PROPERTIES VERSION 1.0 SOVERSION 1)
