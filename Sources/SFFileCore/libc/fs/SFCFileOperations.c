@@ -79,6 +79,7 @@ int createScribbleArchive(const char* archivePath) {
     char txtPath[256];
     char tempPath[256];
     char configFilePath[256];
+    char stateFilePath[256];
 
     char encryptedConfigFilePath[256];
 
@@ -91,11 +92,16 @@ int createScribbleArchive(const char* archivePath) {
         return SFC_ERR_IO;
     }
 
-    if(snprintf(tempPath, sizeof(tempPath), "%s/temp", archivePath) < 0) {
+    if (snprintf(tempPath, sizeof(tempPath), "%s/temp", archivePath) < 0) {
         fprintf(stderr, "An error occurred while formatting 'tempPath'\n");
         return SFC_ERR_IO;
     }
     snprintf(configFilePath, sizeof(configFilePath), "%s/.scconfig", archivePath);
+
+    if (snprintf(stateFilePath, sizeof(stateFilePath), "%s/content.scstate", archivePath)) {
+        fprintf(stderr, "An error occurred while formatting 'stateFilePath'\n");
+        return SFC_ERR_IO;
+    }
 
     if (createDirectory(archivePath) != 0 || 
         createDirectory(imgVecPath) != 0 || 
@@ -109,16 +115,23 @@ int createScribbleArchive(const char* archivePath) {
         perror("An error occurred while creating the .scconfig file");
         return SFC_ERR_IO;
     }
-
-    //int configResult = configureConfigFile(archivePath, configFilePath);
     int configResult = initConfigFile(archivePath, configFilePath);
     if (configResult != 0) {
         fclose(configFile);
         return configResult;
     }
-
     if (fclose(configFile) != 0) {
         perror("An error occurred while closing the .scconfig file");
+        return SFC_ERR_IO;
+    }
+
+    FILE* stateFile = fopen(stateFilePath, "w");
+    if (!stateFile) {
+        perror("An error occurred while creating the content.scstate file");
+        return SFC_ERR_IO;
+    }
+    if (fclose(stateFile) != 0) {
+        perror("An error occurred while closing the content.scstate file");
         return SFC_ERR_IO;
     }
 

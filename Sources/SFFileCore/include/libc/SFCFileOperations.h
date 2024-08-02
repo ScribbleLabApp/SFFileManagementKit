@@ -243,7 +243,9 @@ int initConfigFile(const char* archivePath, const char* filePath);
 ///
 /// \param path The path for which to create the initial directories.
 /// \return Returns 0 if the directories are created successfully, or a negative value if an error occurs.
-static int createInitialDirectories(const char* path) __attribute__((deprecated));
+static int createInitialDirectories(const char* path) __attribute__((deprecated(
+                                                      "createInitialDirectories is deprecated in 0.0.1-alpha (1).",
+                                                      "Use createDirectory(const char* path) instead.")));
 
 #pragma mark - Helper functions end
 
