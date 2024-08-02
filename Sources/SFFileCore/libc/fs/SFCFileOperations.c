@@ -32,6 +32,8 @@
 
 static ConfigArgs g_configArgs;
 
+#pragma mark - Helper functions start
+
 int createDirectory(const char* path) {
     if (mkdir(path, 0777) != 0) {
         if (errno == EEXIST) {
@@ -46,8 +48,7 @@ int createDirectory(const char* path) {
     return SFC_SUCCESS;
 }
 
-// TODO: Refactor configureConfigFile()
-int configureConfigFile(const char* archivePath, const char* filePath) {
+int initConfigFile(const char* archivePath, const char* filePath) {
     int openResult = openConfigFile(archivePath, filePath, SFC_FLAG_READWRITE);
     if (openResult != SFC_SUCCESS) {
         perror("An error occurred while opening config file - SFC_ERR_IO");
@@ -63,7 +64,7 @@ int configureConfigFile(const char* archivePath, const char* filePath) {
     int writeResult = writeConfigFile(archivePath, filePath, jsonContent);
     if (writeResult != SFC_SUCCESS) {
         perror("An error occurred while writing to config file - SFC_ERR_WRITE");
-        return writeResult; // ~> SFC_ERR_WRITE
+        return writeResult;
     }
 
     free(jsonContent);
@@ -109,7 +110,8 @@ int createScribbleArchive(const char* archivePath) {
         return SFC_ERR_IO;
     }
 
-    int configResult = configureConfigFile(archivePath, configFilePath);
+    //int configResult = configureConfigFile(archivePath, configFilePath);
+    int configResult = initConfigFile(archivePath, configFilePath);
     if (configResult != 0) {
         fclose(configFile);
         return configResult;

@@ -228,15 +228,14 @@ void* decodeFromJSON(const char* jsonString);
 /// \return 0 if the directory is created successfully, -1 otherwise.
 int createDirectory(const char* path);
 
-/// \brief Configures the specified configuration file within the .scribble archive.
+/// \brief Initialize the specified configuration file within the .scribble archive.
 ///
-/// This function configures the specified configuration file within the .scribble archive.
-///
+/// This function initializes the specified configuration file within the .scribble archive (SCA).
 /// \param archivePath The path to the .scribble archive.
 /// \param filePath The path to the configuration file within the archive.
 /// \return 0 on success, SFC_ERR_FILE_NOT_FOUND (-3) if the archive or file does not exist,
 ///         SFC_ERR_PERMISSION_DENIED (-4) if permission is denied.
-int configConfigFile(const char* archivePath, const char* filePath);
+int initConfigFile(const char* archivePath, const char* filePath);
 
 /// \brief Creates the initial directories for the given path. (DEPRECATED in 0.1.0-beta.1)
 ///
