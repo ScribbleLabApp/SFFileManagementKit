@@ -39,7 +39,19 @@
 #include <errno.h>
 #include <sys/stat.h>
 
+#include <openssl/rand.h>
+#include <Security/Security.h>
+#include <CommonCrypto/CommonCrypto.h>
+
+#include <libxml/parser.h>
+#include <libxml/tree.h>
+#include <libxml/xmlwriter.h>
+
+#include "SFCXML.h"
 #include "SFCJSON.h"
+
+#include "fssec.h"
+#include "keychh.h"
 
 #define SFC_SUCCESS 0                       ///< Error code indicating success.
 #define SFC_FAILURE -1                      ///< Error code indicating general failure.
@@ -64,17 +76,7 @@
 #define CHECK_NULL(ptr) if ((ptr) == NULL) {       \
     fprintf(stderr, "Memory allocation failed\n"); \
     return NULL;                                   \
-}                                                  \
-
-/// \brief Writes a JSON boilerplate for ScribbleLab files.
-///
-/// This function generates a JSON boilerplate with default values for ScribbleLab files.
-/// The boilerplate includes fields such as name, author, created_at, last_changed_at,
-/// editor_version, encoding, line_endings, psw_pr, encryption_method, and is_Favorite.
-///
-/// \return A JSONVariant object representing the JSON boilerplate.
-///         The caller is responsible for managing the memory of the returned JSONVariant.
-JSONVariant writeJSONBoilerPlate(void);
+}
 
 /// \brief Represents the configuration arguments for a file.
 ///
@@ -93,6 +95,8 @@ typedef struct {
     int is_Favorite;                ///< Indicates whether the file is marked as a favorite.
 } ConfigArgs;
 
+static ConfigArgs g_configArgs;
+
 /// \brief Sets the configuration data for the current file.
 ///
 /// This function updates the configuration data for the current file with the provided
@@ -104,7 +108,9 @@ typedef struct {
 ///                   The function does not make a copy of the ConfigArgs structure, so the caller
 ///                   must ensure that the ConfigArgs structure remains valid for the duration of
 ///                   the program.
-void setConfigData(const ConfigArgs* configArgs);
+void setConfigData(const ConfigArgs* configArgs) {
+    memcpy(&g_configArgs, configArgs, sizeof(ConfigArgs));
+}
 
 /// \brief Retrieves the configuration data for the current file.
 ///
@@ -115,7 +121,75 @@ void setConfigData(const ConfigArgs* configArgs);
 /// \return A pointer to a ConfigArgs structure containing the current file's configuration data.
 ///         The caller should not modify the contents of the ConfigArgs structure.
 ///         If no configuration data is available, the function returns NULL.
-const ConfigArgs* getConfigData(void);
+const ConfigArgs* getConfigData(void) {
+    return &g_configArgs;
+}
+
+/// \brief Writes a JSON boilerplate for ScribbleLab files.
+///
+/// This function generates a JSON boilerplate with default values for ScribbleLab files.
+/// The boilerplate includes fields such as name, author, created_at, last_changed_at,
+/// editor_version, encoding, line_endings, psw_pr, encryption_method, and is_Favorite.
+///
+/// \return A JSONVariant object representing the JSON boilerplate.
+///         The caller is responsible for managing the memory of the returned JSONVariant.
+JSONVariant writeJSONBoilerPlate(void) {
+    const ConfigArgs* configArgs = getConfigData();
+    
+    JSONVariant project = json_create_object();
+    CHECK_NULL(project);
+    json_set_string(project, "name", configArgs->name);
+    json_set_string(project, "author", configArgs->author);
+    json_set_string(project, "created_at", configArgs->created_at);
+    json_set_string(project, "last_changed_at", configArgs->last_changed_at);
+    json_set_string(project, "editor_version", configArgs->editor_version);
+
+    JSONVariant document_settings = json_create_object();
+    CHECK_NULL(document_settings);
+    json_set_string(document_settings, "encoding", configArgs->encoding);
+    json_set_string(document_settings, "line_endings", configArgs->line_endings);
+
+    JSONVariant security = json_create_object();
+    CHECK_NULL(security);
+    json_set_boolean(security, "password_protected", configArgs->psw_pr);
+    json_set_string(security, "encryption_method", configArgs->encryption_method);
+
+    JSONVariant flags = json_create_object();
+    CHECK_NULL(flags);
+    json_set_boolean(flags, "is_Favorite", configArgs->is_Favorite);
+
+    JSONVariant references = json_create_object();
+    CHECK_NULL(references);
+
+    JSONVariant images = json_create_array();
+    CHECK_NULL(images);
+
+    JSONVariant text_files = json_create_array();
+    CHECK_NULL(text_files);
+
+    JSONVariant temporary = json_create_array();
+    CHECK_NULL(temporary);
+
+    JSONVariant root = json_create_object();
+    CHECK_NULL(root);
+    json_set_object(root, "project", project);
+    json_set_object(root, "document_settings", document_settings);
+    json_set_object(root, "security", security);
+    json_set_object(root, "flags", flags);
+    json_set_object(root, "references", references);
+
+    // Free individual JSON variants if necessary
+    // free_json(project);
+    // free_json(document_settings);
+    // free_json(security);
+    // free_json(flags);
+    // free_json(references);
+    // free_json(images);
+    // free_json(text_files);
+    // free_json(temporary);
+
+    return root;
+}
 
 #ifdef __cplusplus
 extern "C" {

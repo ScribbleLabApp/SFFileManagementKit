@@ -28,88 +28,9 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#include "fssec.h"
-#include "keychh.h"
-#include "SFCJSON.h"
 #include "SFCFileOperations.h"
 
-#include <openssl/rand.h>
-#include <Security/Security.h>
-#include <CommonCrypto/CommonCrypto.h>
-
 static ConfigArgs g_configArgs;
-
-#pragma mark - Config Arguments functions start
-
-void setConfigData(const ConfigArgs* configArgs) {
-    memcpy(&g_configArgs, configArgs, sizeof(ConfigArgs));
-}
-
-const ConfigArgs* getConfigData(void) {
-    return &g_configArgs;
-}
-
-#pragma mark - Config Arguments functions end
-
-#pragma mark - Helper functions start
-
-JSONVariant writeJSONBoilerPlate(void) {
-    const ConfigArgs* configArgs = getConfigData();
-    
-    JSONVariant project = json_create_object();
-    CHECK_NULL(project);
-    json_set_string(project, "name", configArgs->name);
-    json_set_string(project, "author", configArgs->author);
-    json_set_string(project, "created_at", configArgs->created_at);
-    json_set_string(project, "last_changed_at", configArgs->last_changed_at);
-    json_set_string(project, "editor_version", configArgs->editor_version);
-
-    JSONVariant document_settings = json_create_object();
-    CHECK_NULL(document_settings);
-    json_set_string(document_settings, "encoding", configArgs->encoding);
-    json_set_string(document_settings, "line_endings", configArgs->line_endings);
-
-    JSONVariant security = json_create_object();
-    CHECK_NULL(security);
-    json_set_boolean(security, "password_protected", configArgs->psw_pr);
-    json_set_string(security, "encryption_method", configArgs->encryption_method);
-
-    JSONVariant flags = json_create_object();
-    CHECK_NULL(flags);
-    json_set_boolean(flags, "is_Favorite", configArgs->is_Favorite);
-
-    JSONVariant references = json_create_object();
-    CHECK_NULL(references);
-
-    JSONVariant images = json_create_array();
-    CHECK_NULL(images);
-
-    JSONVariant text_files = json_create_array();
-    CHECK_NULL(text_files);
-
-    JSONVariant temporary = json_create_array();
-    CHECK_NULL(temporary);
-
-    JSONVariant root = json_create_object();
-    CHECK_NULL(root);
-    json_set_object(root, "project", project);
-    json_set_object(root, "document_settings", document_settings);
-    json_set_object(root, "security", security);
-    json_set_object(root, "flags", flags);
-    json_set_object(root, "references", references);
-
-    // Free individual JSON variants if necessary
-    // free_json(project);
-    // free_json(document_settings);
-    // free_json(security);
-    // free_json(flags);
-    // free_json(references);
-    // free_json(images);
-    // free_json(text_files);
-    // free_json(temporary);
-
-    return root;
-}
 
 int createDirectory(const char* path) {
     if (mkdir(path, 0777) != 0) {
@@ -125,6 +46,7 @@ int createDirectory(const char* path) {
     return SFC_SUCCESS;
 }
 
+// TODO: Refactor configureConfigFile()
 int configureConfigFile(const char* archivePath, const char* filePath) {
     int openResult = openConfigFile(archivePath, filePath, SFC_FLAG_READWRITE);
     if (openResult != SFC_SUCCESS) {
