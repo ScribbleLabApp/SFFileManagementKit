@@ -32,13 +32,7 @@
 #include "keychh.h"
 #include "SFCJSON.h"
 #include "SFCFileOperations.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <string.h>
-#include <errno.h>
-#include <sys/stat.h>
+
 #include <openssl/rand.h>
 #include <Security/Security.h>
 #include <CommonCrypto/CommonCrypto.h>
