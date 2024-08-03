@@ -28,7 +28,7 @@ time_t getFileModTime(const char *path) {
     struct stat fileStat;
     if (stat(path, &fileStat) == -1) {
         perror("Failed to fetch file stat.\n");
-        return -40;
+        return -1;
     }
 
     return fileStat.st_mtime;
@@ -56,6 +56,12 @@ void updateFileState(const char *path) {
     newState->path     = strdup(path);
     newState->modTime  = getFileModTime(path);
     newState->next     = NULL;
+
+    if (!newState->path) {
+        free(newState);
+        perror("Allocation (strdup) failed.\n");
+        return;
+    }
 
     if (prev != NULL) {
         prev->next     = newState;
