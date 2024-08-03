@@ -47,7 +47,7 @@ fi
 # Print introductory information
 bold "${BLUE}Starting the build process for SFFileManagementKit${RESET}"
 echo ""
-echo "Version: 0.1.0-beta (1)"
+echo "Version: 0.1.0-beta (3)"
 echo "Copyright (c) 2024 - ScribbleLabApp. All rights reserved."
 echo ""
 
