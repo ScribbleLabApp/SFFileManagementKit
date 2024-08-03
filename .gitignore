@@ -18,3 +18,5 @@ build/
 *.o
 /cmake-build-debug
 /.idea
+/benchmark
+/benchmark
