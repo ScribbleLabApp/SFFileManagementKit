@@ -28,94 +28,11 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#include "fssec.h"
-#include "keychh.h"
-#include "SFCJSON.h"
 #include "SFCFileOperations.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <string.h>
-#include <errno.h>
-#include <sys/stat.h>
-#include <openssl/rand.h>
-#include <Security/Security.h>
-#include <CommonCrypto/CommonCrypto.h>
 
 static ConfigArgs g_configArgs;
 
-#pragma mark - Config Arguments functions start
-
-void setConfigData(const ConfigArgs* configArgs) {
-    memcpy(&g_configArgs, configArgs, sizeof(ConfigArgs));
-}
-
-const ConfigArgs* getConfigData(void) {
-    return &g_configArgs;
-}
-
-#pragma mark - Config Arguments functions end
-
 #pragma mark - Helper functions start
-
-JSONVariant writeJSONBoilerPlate(void) {
-    const ConfigArgs* configArgs = getConfigData();
-    
-    JSONVariant project = json_create_object();
-    CHECK_NULL(project);
-    json_set_string(project, "name", configArgs->name);
-    json_set_string(project, "author", configArgs->author);
-    json_set_string(project, "created_at", configArgs->created_at);
-    json_set_string(project, "last_changed_at", configArgs->last_changed_at);
-    json_set_string(project, "editor_version", configArgs->editor_version);
-
-    JSONVariant document_settings = json_create_object();
-    CHECK_NULL(document_settings);
-    json_set_string(document_settings, "encoding", configArgs->encoding);
-    json_set_string(document_settings, "line_endings", configArgs->line_endings);
-
-    JSONVariant security = json_create_object();
-    CHECK_NULL(security);
-    json_set_boolean(security, "password_protected", configArgs->psw_pr);
-    json_set_string(security, "encryption_method", configArgs->encryption_method);
-
-    JSONVariant flags = json_create_object();
-    CHECK_NULL(flags);
-    json_set_boolean(flags, "is_Favorite", configArgs->is_Favorite);
-
-    JSONVariant references = json_create_object();
-    CHECK_NULL(references);
-
-    JSONVariant images = json_create_array();
-    CHECK_NULL(images);
-
-    JSONVariant text_files = json_create_array();
-    CHECK_NULL(text_files);
-
-    JSONVariant temporary = json_create_array();
-    CHECK_NULL(temporary);
-
-    JSONVariant root = json_create_object();
-    CHECK_NULL(root);
-    json_set_object(root, "project", project);
-    json_set_object(root, "document_settings", document_settings);
-    json_set_object(root, "security", security);
-    json_set_object(root, "flags", flags);
-    json_set_object(root, "references", references);
-
-    // Free individual JSON variants if necessary
-    // free_json(project);
-    // free_json(document_settings);
-    // free_json(security);
-    // free_json(flags);
-    // free_json(references);
-    // free_json(images);
-    // free_json(text_files);
-    // free_json(temporary);
-
-    return root;
-}
 
 int createDirectory(const char* path) {
     if (mkdir(path, 0777) != 0) {
@@ -131,7 +48,7 @@ int createDirectory(const char* path) {
     return SFC_SUCCESS;
 }
 
-int configureConfigFile(const char* archivePath, const char* filePath) {
+int initConfigFile(const char* archivePath, const char* filePath) {
     int openResult = openConfigFile(archivePath, filePath, SFC_FLAG_READWRITE);
     if (openResult != SFC_SUCCESS) {
         perror("An error occurred while opening config file - SFC_ERR_IO");
@@ -147,7 +64,7 @@ int configureConfigFile(const char* archivePath, const char* filePath) {
     int writeResult = writeConfigFile(archivePath, filePath, jsonContent);
     if (writeResult != SFC_SUCCESS) {
         perror("An error occurred while writing to config file - SFC_ERR_WRITE");
-        return writeResult; // ~> SFC_ERR_WRITE
+        return writeResult;
     }
 
     free(jsonContent);
@@ -162,6 +79,7 @@ int createScribbleArchive(const char* archivePath) {
     char txtPath[256];
     char tempPath[256];
     char configFilePath[256];
+    char stateFilePath[256];
 
     char encryptedConfigFilePath[256];
 
@@ -174,11 +92,16 @@ int createScribbleArchive(const char* archivePath) {
         return SFC_ERR_IO;
     }
 
-    if(snprintf(tempPath, sizeof(tempPath), "%s/temp", archivePath) < 0) {
+    if (snprintf(tempPath, sizeof(tempPath), "%s/temp", archivePath) < 0) {
         fprintf(stderr, "An error occurred while formatting 'tempPath'\n");
         return SFC_ERR_IO;
     }
     snprintf(configFilePath, sizeof(configFilePath), "%s/.scconfig", archivePath);
+
+    if (snprintf(stateFilePath, sizeof(stateFilePath), "%s/content.scstate", archivePath)) {
+        fprintf(stderr, "An error occurred while formatting 'stateFilePath'\n");
+        return SFC_ERR_IO;
+    }
 
     if (createDirectory(archivePath) != 0 || 
         createDirectory(imgVecPath) != 0 || 
@@ -192,15 +115,23 @@ int createScribbleArchive(const char* archivePath) {
         perror("An error occurred while creating the .scconfig file");
         return SFC_ERR_IO;
     }
-
-    int configResult = configureConfigFile(archivePath, configFilePath);
+    int configResult = initConfigFile(archivePath, configFilePath);
     if (configResult != 0) {
         fclose(configFile);
         return configResult;
     }
-
     if (fclose(configFile) != 0) {
         perror("An error occurred while closing the .scconfig file");
+        return SFC_ERR_IO;
+    }
+
+    FILE* stateFile = fopen(stateFilePath, "w");
+    if (!stateFile) {
+        perror("An error occurred while creating the content.scstate file");
+        return SFC_ERR_IO;
+    }
+    if (fclose(stateFile) != 0) {
+        perror("An error occurred while closing the content.scstate file");
         return SFC_ERR_IO;
     }
 

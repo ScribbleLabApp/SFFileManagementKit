@@ -29,6 +29,7 @@ Before building the SFFileManagementKit project, ensure you have the following t
 - **Ninja**: Version 1.12.1 or higher
 - **LLVM (for clang-tidy)**: Homebrew LLVM version 18.1.8 Optimized build
 - **OpenSSL**: Version 3.3.1 stable (bottled)
+- **libxml2**: Latest homebrew version ~> `brew install libxml2`
 
 ### Installation
 

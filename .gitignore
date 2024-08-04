@@ -16,3 +16,6 @@ Sources/_SFUtils/CMakeScripts/ReRunCMake.make
 build/
 /.vscode
 *.o
+/cmake-build-debug
+/.idea
+/benchmark

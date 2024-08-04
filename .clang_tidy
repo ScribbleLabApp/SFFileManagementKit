@@ -9,5 +9,5 @@ Checks: >
   misc-*,
   google-*
 WarningsAsErrors: '*'
-HeaderFilterRegex: '.*'
+HeaderFilterRegex: '^(?!.*Tests/Benchmarks/).*'
 AnalyzeTemporaryDtors: true

@@ -25,7 +25,9 @@
 #ifndef fssec_h
 #define fssec_h
 
+#include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #define AES_KEY_SIZE 256
 #define AES_BLOCK_SIZE 16

@@ -20,6 +20,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Find OpenSSL package
 find_package(OpenSSL REQUIRED)
 
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(LIBXML2 REQUIRED libxml-2.0)
+
 if (OpenSSL_FOUND)
     message(STATUS "Found OpenSSL: ${OPENSSL_VERSION}")
     include_directories(${OPENSSL_INCLUDE_DIR})
@@ -65,6 +68,12 @@ add_library(SFFileCoreLibc STATIC ${LIBC_SOURCES} ${LIBC_HEADERS})
 # Create a static library for libcxx
 add_library(SFFileCoreLibcxx STATIC ${LIBCXX_SOURCES})
 
+# Include directories
+include_directories(${LIBXML2_INCLUDE_DIRS})
+
+# Link directories
+link_directories(${LIBXML2_LIBRARY_DIRS})
+
 # Specify include directories for both libraries
 target_include_directories(SFFileCoreLibc PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -89,6 +98,7 @@ target_include_directories(SFFileCoreLibcxx PUBLIC
 # Optionally link libcxx with libc
 target_link_libraries(SFFileCoreLibcxx PRIVATE SFFileCoreLibc)
 
+target_link_libraries(SFFileCoreLibc PRIVATE ${LIBXML2_LIBRARIES})
 target_link_libraries(SFFileCoreLibc PRIVATE ${OPENSSL_LIBRARIES})
 target_link_libraries(SFFileCoreLibcxx PRIVATE ${OPENSSL_LIBRARIES})
 

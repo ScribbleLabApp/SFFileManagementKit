@@ -25,13 +25,13 @@
 #include "fssec.h"
 #include "keychh.h"
 #include "SFCFileOperations.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <Security/Security.h>
-#include <CommonCrypto/CommonCrypto.h>
+
 #include <openssl/evp.h>
 #include <openssl/aes.h>
 #include <openssl/rand.h>
+
+#include <Security/Security.h>
+#include <CommonCrypto/CommonCrypto.h>
 
 int generate_key_iv(unsigned char *key, unsigned char *iv) {
     if (!RAND_bytes(key, AES_KEY_SIZE)) {
