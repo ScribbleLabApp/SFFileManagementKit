@@ -78,6 +78,11 @@ chmod u+x clean_build.sh
 
 This script will remove the `build` directory and CMake cache files.
 
+### Benchmarks
+
+A detailed guide on how to run and write benchmark test suites can be found [here](docs/benchmarking.md).
+
+
 ## Contributing
 
 Be part of the next revolution in note-taking by contributing to the project. This is a community-led effort, so we welcome as many contributors who can help. Read the [Contribution Guide](https://github.com/ScribbleLabApp/ScribbleLab/blob/main/CONTRIBUTING.md) for more information.

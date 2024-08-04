@@ -30,6 +30,7 @@
 // Import benchmark macros & functions
 #include "bench.h"
 
+// Replace this function with your actual benchmark test implementation
 void test(void) {
     //printf("Running benchmark test for 'test'\n");
     //printf("Benchmark test completed. Time taken: %.9f seconds\n", end_time - start_time);
