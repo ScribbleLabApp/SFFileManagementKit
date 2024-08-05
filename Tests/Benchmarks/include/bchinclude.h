@@ -1,4 +1,4 @@
-//===-- Benchmarks/include/bchsuite.h - Benchmarking --------------*- C -*-===//
+//===-- Benchmarks/include/bchinclude.h - Benchmarking ------------*- C -*-===//
 //                                                                            //
 // This source file is part of the Scribble Foundation open source project    //
 //                                                                            //
@@ -19,27 +19,12 @@
 // limitations under the License.                                             //
 //                                                                            //
 //===----------------------------------------------------------------------===//
-///
-/// \file
-///
-//===----------------------------------------------------------------------===//
 
-#ifndef BCHSUITE_H
-#define BCHSUITE_H
+#ifndef BCHINCLUDE_H
+#define BCHINCLUDE_H
 
-// Import benchmark macros & functions
-#include "bench.h"
+#include "../../SFFileCore/include/libc/fssec.h"
+#include "../../SFFileCore/include/libc/keychh.h"
+#include "../../SFFileCore/include/libc/SFCFileOperations.h"
 
-// Import header files from SFFIleCore
-#include "bchinclude.h"
-
-// Replace this function with your actual benchmark test implementation
-void test(void) {
-    //printf("Running benchmark test for 'test'\n");
-    //printf("Benchmark test completed. Time taken: %.9f seconds\n", end_time - start_time);
-
-    BENCH("Example Function Benchmark", 10, 100);
-    for (volatile int i = 0; i < 1000000; ++i);
-}
-
-#endif //BCHSUITE_H
+#endif /* BCHINCLUDE_H */
