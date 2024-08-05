@@ -76,7 +76,12 @@ cd "$BUILD_DIR" || { red "Failed to change directory to $BUILD_DIR"; exit 1; }
 
 echo ""
 bold "${ORANGE}==>${RESET} Configuring the project..."
-cmake -G Ninja "$SOURCE_DIR" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON || { red "CMake configuration failed"; exit 1; }
+#cmake -G Ninja "$SOURCE_DIR" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON || { red "CMake configuration failed"; exit 1; }
+cmake -G Ninja  \
+  -D SFUTILS_BIN_DIR:PATH="build/lib/" \
+  -D SFUtils_SRC_DIR:PATH="Sources/_SFUtils" \
+  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+  "$SOURCE_DIR" || { red "CMake configuration failed"; exit 1; }
 
 echo ""
 bold "${ORANGE}==>${RESET} Compiling & Building the project..."

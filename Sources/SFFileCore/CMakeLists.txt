@@ -81,6 +81,10 @@ target_include_directories(SFFileCoreLibc PUBLIC
 
     ${CMAKE_CURRENT_SOURCE_DIR}/include/libc
     ${CMAKE_SOURCE_DIR}/Sources/SFFileCore/include/libc
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libc/*.h
+    ${CMAKE_SOURCE_DIR}/Sources/SFFileCore/include/libc/*.h
+
     ../_SFUtils/include
     ../SFFileCoreBridge/include/*.h
 )

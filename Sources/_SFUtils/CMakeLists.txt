@@ -27,6 +27,8 @@ target_link_libraries(SFUtils PRIVATE ${LIBXML2_LIBRARIES})
 # Specify the include directories
 target_include_directories(SFUtils PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${LIBXML2_INCLUDE_DIRS}
+    ${UTILS_HEADERS}
 )
 
 # Optionally set properties for the library

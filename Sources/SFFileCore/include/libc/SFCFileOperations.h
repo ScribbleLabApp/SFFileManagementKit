@@ -337,6 +337,7 @@ int openTxtFile(const char* archivePath, const char* filePath, int flags);
 /// \param data A pointer to the file's data.
 /// \param allocSize The allocated size of the data buffer.
 /// \param size The actual size of the data.
+/*
 typedef struct file {
     _Bool isOpen;
     _Bool isWritable;
@@ -346,5 +347,6 @@ typedef struct file {
     int allocSize;
     int size;
 } file_t;
+*/
 
 #endif /* SFCFileOperations_h */
